@@ -1,13 +1,13 @@
 <template>
   <div class="carlist-page">
-      <div class="carlist-item" v-for="(item,index) in carlist" :key="index">
+      <div class="carlist-item" v-for="(item,index) in carShowlist" :key="index">
           <div class="item-image">
-              <img :src="item.src" alt="公车图片">
+              <img :src="item.carImage" alt="公车图片" />
           </div>
           <div class="item-content">
-              <p>姓名：{{item.name}}</p>
-              <p>手机：{{item.phone}}</p>
-              <p class="content">任务：{{item.content}}</p>
+              <p>姓名：{{item.userName}}</p>
+              <p>手机：{{item.userPhone}}</p>
+              <p class="content">状态：在用</p>
           </div>
           <div class="clear"></div>
       </div>
@@ -30,8 +30,12 @@
 }
 .item-image{
     width: 30%;
-    height: 100%;
+    height: 82px;
     float: left;
+}
+.item-image>img{
+    width: 120%;
+    height: 100%;
 }
 .item-content{
     width: 70%;
@@ -63,92 +67,27 @@
 
 <script>
 export default {
-  data() {
+    data() {
       return {
-           carlist: [
-              {
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              }
-          ]
+           carShowlist: []
         }
+    },
+    created() {
+        let _this = this;             
+        this.axios({
+            method: 'get',
+            url: '/carlist',
+        }).then(function (response){        
+            _this.carShowlist = response.data.carlist;
+            console.log(_this.carShowlist);                  
+            for(var i = 0; i<_this.carShowlist.length;i++){
+                _this.carShowlist[i].carImage = 'data:image/png;base64,' + _this.carShowlist[i].carImage;
+            }
+        }).catch(function (error){
+            if(error){
+                throw error;
+            }
+        })
     }
 }
 </script>

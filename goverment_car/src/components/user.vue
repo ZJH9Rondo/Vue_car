@@ -3,7 +3,7 @@
       <Card style="width:100%" :bordered="false">
         <div style="text-align:center">
             <img src="">
-            <h3>公务员</h3>
+            <h3>{{userNumber}}</h3>
         </div>
      </Card>
      <Dropdown class="used-list" :transfer="true" trigger="click">
@@ -12,7 +12,7 @@
              <Icon style="float: right" type="chevron-down" :size="20"></Icon>
          </div>
          <DropdownMenu class="item-container" slot="list">
-             <div v-for="(item,index) in userlist" :key="index" class="list-item" >
+             <div v-for="(item,index) in usedlist" :key="index" class="list-item" >
                  <div class="item-image">
                     <img :src="item.src" alt="">
                 </div>
@@ -30,19 +30,18 @@
              <Icon style="float: right" type="chevron-down" :size="20"></Icon>
          </div>
          <DropdownMenu class="item-container" slot="list">
-             <div v-for="(item,index) in userlist" :key="index" class="list-item" >
+             <div v-for="(item,index) in usinglist" :key="index" class="list-item" >
                  <div class="item-image">
                     <img :src="item.src" alt="">
                 </div>
                 <div class="item-content">
                     <p class="content">任务：{{item.content}}</p>
-                    <Button class="use-finish" type="success">结束用车</Button>
+                    <Button class="use-finish" type="success" @click="drive_END(item)">结束用车</Button>
                 </div>
              </div>
          </DropdownMenu>
      </Dropdown>
-
-     <mt-button class="signout-button"　type="danger">注销</mt-button>
+     <mt-button class="signout-button"　type="danger" @click="logout">注销</mt-button>
   </div>
 </template>
 
@@ -123,46 +122,52 @@ export default {
     conponents: {Button},
     data() {
       return {
-          userlist: [
-              {
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              },{
-                  'src': '',
-                  'name': '钟嘉豪',
-                  'phone': '17691159270',
-                  'content': '2017年10月8日，驾车前往长安区执行公务，2017年10月8日，驾车前往长安区执行公务'
-              }
-          ]
+          userNumber: window.localStorage.getItem('userNumber'),
+          usedlist: [],
+          usinglist: []
       }
-  }
+    },
+    created(){
+        var _finishURL = '/finishlist?userNumber=' + window.localStorage.getItem('userNumber');
+        var _unfinishURL = '/unfinishlist?userNumber=' + window.localStorage.getItem('userNumber');
+        var _this = this;
+
+        this.axios({
+            method: 'get',
+            url: _finishURL
+        }).then(function (response){
+            _this.usedlist = response.data.list;
+        }).catch(function (error){
+            throw error;
+        });
+
+        this.axios({
+            method: 'get',
+            url: _unfinishURL
+        }).then(function (response){
+            _this.usinglist = response.data.list;
+        }).catch(function (error){
+            throw error;
+        });
+    },
+    methods: {
+        logout() {
+            window.localStorage.removeItem('user_token');
+            window.localStorage.removeItem('userNumber');
+            this.$router.push('/signin');
+        },
+        drive_END(item) {
+            var drive_endURL = '/usefinish?driveId=' + item.id +'&userNumber=' + window.localStorage.getItem('userNumber');
+            this.axios({
+                method: 'get',
+                url: drive_endURL
+            }).then(function (response){
+                console.log(response);
+            }).catch(function (error){
+                throw error;
+            });
+        }
+    }
 }
 </script>
 

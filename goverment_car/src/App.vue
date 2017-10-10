@@ -1,10 +1,12 @@
 <template>
   <div id="app">
     <mt-header fixed title="政府公车管理系统">
-      <router-link to="/" slot="left">
-        <mt-button icon="back">返回</mt-button>
-      </router-link>
-      <mt-button icon="more" slot="right"></mt-button>
+      <mt-button slot="left" @click="usermenu">
+        <Icon type="person" :size="24"></Icon>
+      </mt-button>
+      <mt-button slot="right" @click="addcar">
+        <Icon type="model-s" :size="23"></Icon>
+      </mt-button>      
     </mt-header>
     <keep-alive>
       <router-view></router-view>
@@ -28,11 +30,11 @@
 </template>
 
 <script>
-import {Header,Button,Tabbar,TabItem} from 'mint-ui'
+import {Header,Tabbar,TabItem} from 'mint-ui'
 
 export default {
   name: 'app',
-  components: {Header,Button,Tabbar,TabItem},
+  components: {Header,Tabbar,TabItem},
   data(){
     return {}
   },
@@ -41,9 +43,15 @@ export default {
       this.$router.push('/carList');
     },
     godrive() {
-      this.$router.push('/drive');
+      this.$router.push('/');
     },
     gouser() {     
+      this.$router.push('/user');
+    },
+    addcar() {
+      this.$router.push('/addcar');
+    },
+    usermenu(){
       this.$router.push('/user');
     }
   }

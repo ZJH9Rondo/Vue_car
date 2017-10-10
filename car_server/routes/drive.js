@@ -3,7 +3,8 @@ var router = express.Router();
 
 var driveModule = require('../modles/drive');
 var carModule = require('../modles/car');
-var userModule = require('../modles/users');
+var userModule = require('../modles/user');
+var checkToken = require('../config/token').check;
 
 /*
  *  method: POST
@@ -12,49 +13,80 @@ var userModule = require('../modles/users');
  *  return: Boolean { datatype: JSON && Boolean}
  */
 router.post('/drive',function (req,res,next){
-    var driveData = JSON.parse(req.body);
+    var token = req.body.token || req.query.token || req.headers['token'];
 
-    var driveAdd = new driveModule({
-        carImage: driveData.carImage,
-        userName: driveData.userName,
-        useTime: driveData.useTime,
-        userLocation: driveData.userLocation,
-        task: driveData.task,
-        useStatus: driveData.status    
-    });
+    if(checkToken(token)){
+        var driveAdd = new driveModule({
+            carImage: req.body.carImage,
+            userNumber: req.body.userNumber,
+            useTime: req.body.useTime,
+            userLocation: req.body.userLocation,
+            task: req.body.task,
+            useStatus: req.body.useStatus    
+        });
+    
+        driveAdd.save(function(err) {
+            if(err){
+                throw err;
+            }else{
+                userModule.find({number: req.body.userNumber}).exec(function (err,result){
+                    if(err){
+                        throw err;
+                    }
 
-    driveAdd.save(function(err) {
-        if(err){
-            throw err;
-        }else{
-            carModule.update({carNumber: driveData.carNumber},{userName: driveData.userName,userPhone: driveData.userPhone,carStatus: false},function (error){
-                if(error){
-                    throw error;
-                }else{
-                    res.json('true');
-                }
-            })
-        }
-    })
+                    carModule.find({carNumber: req.body.carNumber}).exec(function (err,result){
+                        if(result[0].carStatus){
+                            carModule.update({carNumber: req.body.carNumber},{userName: result[0].name,userPhone: result[0].phone,carStatus: req.body.useStatus},function (error){
+                                if(error){
+                                    throw error;
+                                }else{
+                                    res.json({
+                                        'status': 1
+                                    });
+                                }
+                            })
+                        }else{
+                            res.json({
+                                'status': -1
+                            });
+                        }
+                    })
+                });
+            }
+        })
+    }else{
+        res.json({
+            'status': 0
+        });
+    }
 });
 
 /*
  *  method: GET
  *  url: ' /finishlist '
- *  params: userName
+ *  params: userNumber
  *  return: finishlist { datatype: JSON && Array}
  */
-router.get('/finishlist',function(req,res,next) {
-    var userData = JSON.parse(req.query);    
+router.get('/finishlist',function(req,res,next) {  
+    var token = req.body.token || req.query.token || req.headers['token']; 
 
-    driveModule.find({name: userData.userName}).then(function (docs){
-        var finishlist = [];
-        for(var i=0;i<docs.length;i++){
-           if(docs[i].useStatus){
-               finishlist.push(docs[i]);
-           } 
-        }
-    });
+    if(checkToken(token)){
+        driveModule.find({userNumber: req.query.userNumber}).exece(function (err,result){
+            var finishlist = [];
+            for(var i=0;i<result.length;i++){
+               if(result[i].useStatus){
+                   finishlist.push(result[i]);
+               } 
+            }
+            res.json({
+                'list': finishlist
+            });
+        });
+    }else{
+        res.json({
+            'list': []
+        })
+    }
 });
 
 /*
@@ -64,38 +96,54 @@ router.get('/finishlist',function(req,res,next) {
  *  return: unfinishlist { datatype: JSON && Array}
  */
 router.get('/unfinishlist',function (req,res,next){
-    var userData = JSON.parse(req.query);
+    var token = req.body.token || req.query.token || req.headers['token']; 
 
-    driveModule.find({name: userData.userName}).then(function (docs){
-        var unfinishlist = [];
-
-        for(var i=0;i < docs.length;i++){
-            if(!docs[i].useStatus){
-                unfinishlist.push(docs[i]);
+    if(checkToken(token)){
+        driveModule.find({userNumber: req.query.userNumber}).exec(function (err,result){
+            var unfinishlist = [];
+    
+            for(var i=0;i < result.length;i++){
+                if(!result[i].useStatus){
+                    unfinishlist.push(result[i]);
+                }
             }
-        }
-        res.json(unfinishlist);
-    });
+            res.json({
+                'list': unfinishlist
+            });
+        });
+    }else{
+        res.json({
+            'list': []
+        });
+    }
 });
 
 /*
  *  method: GET
  *  url: ' /usefinish '
- *  params: driveId & userName
+ *  params: driveId & userNumber
  *  return: Boolean { datatype: JSON && Boolean}
  */
 router.get('/usefinish',function (req,res,next){
-    var driveData = JSON.parse(req.query);
+    var token = req.body.token || req.query.token || req.headers['token'];
 
-    driveModule.update({_id: driveData.id},{useStatus: true},function (error){
-        carModule.update({userName: driveData.userName},{carStatus: true},function (error){
-            if(error){
-                throw error;
-            }else{
-                res.json('true');
-            }    
-        })
-    });
+    if(checkToken(token)){
+        driveModule.update({_id: req.query.driveId},{useStatus: true},function (error){
+            carModule.update({userNumber: req.query.userNumber},{userName: '暂无',userPhone: '暂无',carStatus: true},function (error){
+                if(error){
+                    throw error;
+                }else{
+                    res.json({
+                        'status': true
+                    });
+                }    
+            })
+        });
+    }else{
+        res.json({
+            'status': false
+        });
+    }
 });
 
 module.exports = router;

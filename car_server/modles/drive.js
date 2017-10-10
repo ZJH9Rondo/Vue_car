@@ -3,8 +3,8 @@ var Schema = mongoose.Schema;
 
 var driveModule = new Schema({
     carImage: String,
-    userName: String,
-    useTime: String,
+    userNumber: String,
+    useTime: [Schema.Types.String],
     userLocation: String,
     task: String,
     useStatus: Boolean

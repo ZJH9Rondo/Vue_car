@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var carModule = require('../modles/car');
+var checkToken = require('../config/token').check;
 
 /*
  *  method: POST
@@ -10,23 +11,29 @@ var carModule = require('../modles/car');
  *  return: Boolean { datatype: JSON && Boolean}
  */
 router.post('/addcar',function (req,res,next){
-    var carData = JSON.parse(req.budy);
+    var token = req.body.token || req.query.token || req.headers['token'];
 
-    var carAdd = new carModule({
-        carImage: carData.carImage,
-        carNumber: carData.carNumber,
-        userName: '',
-        userPhone: '',
-        carStatus: true
-    });
-
-    carAdd.save(function (err){
-        if(err){
-            throw err;
-        }else{
-            res.json('true');
-        }
-    });
+    if(checkToken(token)){
+        var carAdd = new carModule({
+            carImage:  req.body.carImage,
+            carNumber: req.body.carNumber,
+            carStatus: true
+        });
+    
+        carAdd.save(function (err){
+            if(err){
+                throw err;
+            }else{
+                res.json({
+                    'status': true
+                });
+            }
+        });
+    }else{
+        res.json({
+            'status': false
+        });
+    }
 });
 
 /*
@@ -36,9 +43,19 @@ router.post('/addcar',function (req,res,next){
  *  return: finishlist { datatype: JSON && Array}
  */
 router.get('/carlist',function (req,res,next){
-    driveModule.find({}).then(function (docs){
-       res.json(docs); 
-    });
+    var token = req.body.token || req.query.token || req.headers['token'];
+
+    if(checkToken(token)){
+        carModule.find({}).then(function (docs){
+            res.json({
+                'carlist': docs
+            }); 
+        });
+    }else{
+        res.json({
+            'carlist': [] 
+        });
+    }
 });
 
 module.exports = router;

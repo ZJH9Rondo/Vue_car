@@ -6,18 +6,22 @@ import iView from 'iview'
 import 'mint-ui/lib/style.css'
 import 'iview/dist/styles/iview.css'
 import App from './App'
-import router from './router'
+import config from './router'
+import store from './store/userstate'
 
 Vue.config.productionTip = false
 Vue.use(MintUI)
 Vue.use(iView)
 
+var router = config.router;
+var axios = config.axios;
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
+  axios,
+  store,
   template: '<App/>',
   components: { App }
-})
-
-router.push('/user');
+});

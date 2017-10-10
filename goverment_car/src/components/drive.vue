@@ -7,32 +7,34 @@
             </div>
         </Card>
         <Form :model="formItem" :label-width="80">
-            <FormItem label="车辆拍照">
+            <FormItem label="车辆拍照：">
                 <video id="drive_video" autoplay></video>
                 <canvas id="drive_canvas"></canvas>
                 <Button type="warning" @click="useCamera">启动摄像头</Button>
                 <Button type="primary" @click="getPhoto">拍照</Button>
             </FormItem>
-            <FormItem label="日期控件">
+            <FormItem label="日期控件：">
                 <Row>
                    <Col span="12">
-                     <DatePicker type="daterange" :options="options2" placement="top-end" placeholder="选择日期" style="width: 200px"></DatePicker>
+                     <DatePicker v-model="formItem.useTime" type="daterange" :options="options2" placement="top-end" placeholder="选择日期" style="width: 200px"></DatePicker>
                    </Col>
                 </Row>
             </FormItem>
-            <FormItem label="用车定位">
-                <Input v-model="userlocation" icon="location" style="width: 80%"></Input>
+            <FormItem label="车牌号：">
+                <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌"></Input>
+            </FormItem>
+            <FormItem label="用车定位：">
+                <Input v-model="formItem.userlocation" icon="location" style="width: 80%"></Input>
                 <i-switch v-model="formItem.switch"　@on-change="getlocation">
                     <span slot="open">开</span>
                     <span slot="close">关</span>
                 </i-switch>
             </FormItem>
-            <FormItem label="出行任务">
-                <Input v-model="formItem.textarea" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请输入公车出行任务..."></Input>
+            <FormItem label="出行任务：">
+                <Input v-model="formItem.task" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请输入公车出行任务..."></Input>
             </FormItem>
         </Form>
-        <Button type="primary">提交</Button>
-        <Button type="ghost" style="margin-left: 8px">取消</Button>
+        <Button type="primary" @click="submitDrive">提交</Button>
     </div>
 </template>
 
@@ -49,6 +51,7 @@
 #drive_video{
     width: 100%;
     height: 150px;
+    border: 1px solid #cccccc;
 }
 #drive_canvas{
     width: 90%;
@@ -62,10 +65,13 @@
  export default {
     data () {
         return {
-            userlocation: '经度：0，纬度：0',
             formItem: {
                 switch: false,
-                textarea: ''
+                carImage: '',
+                useTime: [],
+                carNumber: '',                
+                userlocation: '经度：0，纬度：0',
+                task: ''
             },
             options1: {
                     shortcuts: [
@@ -154,11 +160,11 @@
                 };
                 stream.onended = noStream;
                 aVideo.onloadedmetadata = function () {
-                this.$$Message.success('摄像头成功打开！');
+                this.$Message.success('摄像头成功打开！');
                 };
             }
             function noStream(err) {
-                this.$$Message.error(err);
+                this.$Message.error(err);
             }
         },
         getPhoto() {
@@ -166,18 +172,56 @@
             var aCanvas=document.getElementById('drive_canvas');
             var ctx=aCanvas.getContext('2d');
 
-            ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上            
+            ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
+            this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
         },
         getlocation() {
             function showPosition(position){
-                this.userlocation = '经度：'+position.coords.longitude+'，纬度：'+position.coords.latitude;
-                console.log(this.userlocation);
+                this.formItem.userlocation = '经度：'+position.coords.longitude+'，纬度：'+position.coords.latitude;
             }
             if(navigator.geolocation && this.formItem.switch){
                 this.$Message.success('定位功能已打开！');                
                 navigator.geolocation.getCurrentPosition(showPosition);
             }else{
                 this.$Message.error('定位功能已关闭！');
+            }
+        },
+        submitDrive() {
+            let _this = this;
+            if(window.localStorage.getItem('userNumber')){
+                this.axios({
+                method: 'post',
+                url: '/drive',
+                data: {
+                    carImage: this.formItem.carImage,
+                    userNumber: window.localStorage.getItem('userNumber'),
+                    useTime: [this.formItem.useTime[0],this.formItem.useTime[1]],
+                    userLocation: this.formItem.userLocation,
+                    carNumber: this.formItem.carNumber,   
+                    task: this.formItem.task,
+                    useStatus: false   
+                    }
+                }).then(function (response){
+                    switch(response.data.status){
+                        case '1' :  _this.$Message.error('登记成功！');                        
+                                    _this.$router.push('/carlist');
+                                    break;
+                        case '0' :  _this.$Message.error('登记失败！请重新登记。');
+                                    _this.$router.push('/drive');
+                                    break;
+                        case '-1':  _this.$Message.error('车辆已被借用！请更换车辆或联系使用者。');
+                                    _this.$router.push('/carlist');
+                                    break;
+                        default  :  break;
+                    };
+                }).catch(function (error){
+                    if(error){
+                        throw error;
+                    }
+                });
+            }else{
+                window.localStorage.removeItem('user_token');
+                this.$router.push('/signin');
             }
         }
     }

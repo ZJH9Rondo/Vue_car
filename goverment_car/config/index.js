@@ -27,7 +27,71 @@ module.exports = {
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/register': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/register': '/register'
+        }
+      },
+      '/login': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/login': '/login'
+        }
+      },
+      '/checktoken': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/checktoken': '/checktoken'
+        }
+      },
+      '/drive': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/drive': '/drive'
+        }
+      },
+      '/finishlist': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/finishlist': '/finishlist'
+        }
+      },
+      '/unfinishlist': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/unfinishlist': '/unfinishlist'
+        }
+      },
+      '/usefinish': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/usefinish': '/usefinish'
+        }
+      },
+      '/addcar': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/addcar': '/addcar'
+        }
+      },
+      '/carlist': {
+        target: 'http://127.0.0.1:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/carlist': '/carlist'
+        }
+      }
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

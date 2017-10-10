@@ -4,17 +4,20 @@
             <FormItem label="姓名" prop="name">
                 <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
             </FormItem>
+            <FormItem label="密码" prop="password">
+                <Input v-model="formValidate.password" placeholder="请输入密码"></Input>
+            </FormItem>
             <FormItem label="政务编号" prop="number">
                 <Input v-model="formValidate.number" placeholder="请输入政务编号"></Input>
             </FormItem>
             <FormItem label="电话" prop="phone">
                 <Input v-model="formValidate.phone" placeholder="请输入政务编号"></Input>
             </FormItem>
-            <FormItem label="介绍" prop="desc">
-                <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入..."></Input>
+            <FormItem label="部门" prop="department">
+                <Input v-model="formValidate.department" placeholder="请输入政务编号"></Input>
             </FormItem>
             <FormItem class="signup-button">
-                <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>
+                <Button type="primary" @click="handleSubmit()">提交</Button>
                 <Button type="ghost" @click="handleReset('formValidate')" style="margin-left: 8px">重置</Button>
             </FormItem>
         </Form>
@@ -44,13 +47,17 @@
             return {
                 formValidate: {
                     name: '',
+                    password: '',
                     number: '',
                     phone: '',
-                    desc: ''
+                    department: '',
                 },
                 ruleValidate: {
                     name: [
                         { required: true, message: '姓名不能为空', trigger: 'blur' }
+                    ],
+                    password: [
+                        {required: true, message: '姓名不能为空', trigger: 'blur' }
                     ],
                     number: [
                         { required: true, message: '编号不能为空', trigger: 'blur' },
@@ -58,23 +65,33 @@
                     phone: [
                         { required: true, message: '手机号不能为空', trigger: 'blur' }
                     ],
-                    desc: [
-                        { required: true, message: '请输入个人介绍', trigger: 'blur' },
-                        { type: 'string', min: 20, message: '介绍不能少于20字', trigger: 'blur' }
+                    department: [
+                        { required: true, message: '请输入部门名称', trigger: 'blur' },
                     ]
                 }
             }
         },
         methods: {
-            handleSubmit (name) {
-                this.$refs[name].validate((valid) => {
-                    if (valid) {
-                        this.$Message.success('提交成功!');
-                        this.$router.push('/');
-                    } else {
-                        this.$Message.error('表单验证失败!');
+            handleSubmit () {
+                let _this = this;
+                _this.axios({
+                    method: 'post',
+                    url: '/register',
+                    data: {
+                        'name': _this.formValidate.name,
+                        'password': _this.formValidate.password,
+                        'phone': _this.formValidate.phone,
+                        'number': _this.formValidate.number,
+                        'department': _this.formValidate.department
                     }
-                })
+                }).then(function (response){
+                    _this.$Message.success('注册成功');
+                    setTimeout(function() {
+                        _this.$router.push('/'); 
+                    }, 1000);
+                }).catch(function (error){
+                    console.log(error);
+                });
             },
             handleReset (name) {
                 this.$refs[name].resetFields();

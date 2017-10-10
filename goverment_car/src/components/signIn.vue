@@ -12,7 +12,7 @@
         </Input>
       </FormItem>
       <FormItem>
-        <Button class="sign-button" type="primary" @click="handleSubmit('formInline')">登录</Button>
+        <Button class="sign-button" type="primary" @click="handleSubmit()">登录</Button>
       </FormItem>
     </Form>
     <p class="signup-box">
@@ -66,14 +66,23 @@
             }
         },
         methods: {
-            handleSubmit(name) {
-                this.$refs[name].validate((valid) => {
-                    if (valid) {
-                        this.$Message.success('登录成功!');
-                    } else {
-                        this.$Message.error('请查证账号密码后登录!');
-                    }
-                })
+            handleSubmit() {
+              let _this = this;
+              let _url = '/login?user=' + this.formInline.user + '&password=' + this.formInline.password;
+              
+              _this.axios({
+                method: 'get',
+                url: _url
+              }).then(function (response){
+                 _this.$Message.success('登录成功!');
+                 window.localStorage.setItem('user_token',response.data.token);
+                 window.localStorage.setItem('userNumber',_this.formInline.user);
+                 setTimeout(function (){
+                    _this.$router.push('/');
+                 },1000); 
+              }).catch(function (error){
+                _this.$Message.error('登录失败！');
+              });
             }
         }
     }
