@@ -8,10 +8,11 @@
         </Card>
         <Form :model="formItem" :label-width="80">
             <FormItem label="车辆拍照：">
-                <video id="drive_video" autoplay></video>
+                <Modal title='拍照' v-model="videoflag" @on-ok="ok" @on-cancel="cancel" ok-text="拍照">
+                    <video id="drive_video" autoplay></video>
+                </Modal>
                 <canvas id="drive_canvas"></canvas>
-                <Button type="warning" @click="useCamera">启动摄像头</Button>
-                <Button type="primary" @click="getPhoto">拍照</Button>
+                <Button type="warning" @click="useCamera" style="width: 75%">启动摄像头</Button>
             </FormItem>
             <FormItem label="日期控件：">
                 <Row>
@@ -50,8 +51,7 @@
 }
 #drive_video{
     width: 100%;
-    height: 150px;
-    border: 1px solid #cccccc;
+    height: 250px;
 }
 #drive_canvas{
     width: 90%;
@@ -65,6 +65,7 @@
  export default {
     data () {
         return {
+            videoflag: false,
             formItem: {
                 switch: false,
                 carImage: '',
@@ -142,11 +143,24 @@
         }
     },
     methods:{
+        ok() {
+            var aVideo=document.getElementById('drive_video');
+            var aCanvas=document.getElementById('drive_canvas');
+            var ctx=aCanvas.getContext('2d');
+
+            ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
+            this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
+        },
+        cancel() {
+            this.videoflag = false;
+        },
         useCamera() {
             var aVideo=document.getElementById('drive_video');
             var aCanvas=document.getElementById('drive_canvas');
             var ctx=aCanvas.getContext('2d');
-            
+            var _this = this;
+
+            this.videoflag = true;
             navigator.getUserMedia  = navigator.getUserMedia ||
                             navigator.webkitGetUserMedia ||
                             navigator.mozGetUserMedia ||
@@ -160,30 +174,24 @@
                 };
                 stream.onended = noStream;
                 aVideo.onloadedmetadata = function () {
-                this.$Message.success('摄像头成功打开！');
+                _this.$Message.success('摄像头成功打开！');
                 };
             }
             function noStream(err) {
-                this.$Message.error(err);
+                _this.$Message.error(err);
             }
-        },
-        getPhoto() {
-            var aVideo=document.getElementById('drive_video');
-            var aCanvas=document.getElementById('drive_canvas');
-            var ctx=aCanvas.getContext('2d');
-
-            ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
-            this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
         },
         getlocation() {
-            function showPosition(position){
-                this.formItem.userlocation = '经度：'+position.coords.longitude+'，纬度：'+position.coords.latitude;
-            }
-            if(navigator.geolocation && this.formItem.switch){
-                this.$Message.success('定位功能已打开！');                
-                navigator.geolocation.getCurrentPosition(showPosition);
+            var _this = this;
+
+            if(navigator.geolocation && _this.formItem.switch){
+                _this.$Message.success('定位功能已打开！');                
+                navigator.geolocation.getCurrentPosition(function (position){
+                    alert(position.coords);
+                    _this.formItem.userlocation = '经度：'+position.coords.longitude+'，纬度：'+position.coords.latitude;
+                });
             }else{
-                this.$Message.error('定位功能已关闭！');
+                _this.$Message.error('定位功能已关闭！');
             }
         },
         submitDrive() {
@@ -203,14 +211,20 @@
                     }
                 }).then(function (response){
                     switch(response.data.status){
-                        case '1' :  _this.$Message.error('登记成功！');                        
-                                    _this.$router.push('/carlist');
+                        case 1 :  _this.$Message.success('登记成功！');                        
+                                    setTimeout(function() {
+                                        _this.$router.push('/carlist');
+                                    }, 1000);
                                     break;
-                        case '0' :  _this.$Message.error('登记失败！请重新登记。');
-                                    _this.$router.push('/drive');
+                        case 0 :  _this.$Message.error('登记失败！请重新登记。');
+                                    setTimeout(function() {
+                                        _this.$router.push('/drive');
+                                    }, 1000);
                                     break;
-                        case '-1':  _this.$Message.error('车辆已被借用！请更换车辆或联系使用者。');
-                                    _this.$router.push('/carlist');
+                        case -1:  _this.$Message.error('车辆已被借用！请更换车辆或联系使用者。');
+                                    setTimeout(function() {
+                                        _this.$router.push('/carlist');    
+                                    }, 1000);
                                     break;
                         default  :  break;
                     };

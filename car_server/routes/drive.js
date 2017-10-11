@@ -33,10 +33,12 @@ router.post('/drive',function (req,res,next){
                     if(err){
                         throw err;
                     }
+                    var _userTarget = result[0];
 
                     carModule.find({carNumber: req.body.carNumber}).exec(function (err,result){
+                        console.log(result);
                         if(result[0].carStatus){
-                            carModule.update({carNumber: req.body.carNumber},{userName: result[0].name,userPhone: result[0].phone,carStatus: req.body.useStatus},function (error){
+                            carModule.update({carNumber: req.body.carNumber},{userName: _userTarget.name,userPhone: _userTarget.phone,carStatus: req.body.useStatus},function (error){
                                 if(error){
                                     throw error;
                                 }else{
@@ -71,7 +73,8 @@ router.get('/finishlist',function(req,res,next) {
     var token = req.body.token || req.query.token || req.headers['token']; 
 
     if(checkToken(token)){
-        driveModule.find({userNumber: req.query.userNumber}).exece(function (err,result){
+        driveModule.find({userNumber: req.query.userNumber}).exec(function (err,result){
+            console.log(result);
             var finishlist = [];
             for(var i=0;i<result.length;i++){
                if(result[i].useStatus){
@@ -129,15 +132,25 @@ router.get('/usefinish',function (req,res,next){
 
     if(checkToken(token)){
         driveModule.update({_id: req.query.driveId},{useStatus: true},function (error){
-            carModule.update({userNumber: req.query.userNumber},{userName: '暂无',userPhone: '暂无',carStatus: true},function (error){
-                if(error){
-                    throw error;
-                }else{
-                    res.json({
-                        'status': true
-                    });
-                }    
-            })
+            if(error){
+                throw error;
+            }
+
+            userModule.find({number: req.query.userNumber}).exec(function (err,result){
+                if(err){
+                    throw err;
+                }
+
+                carModule.update({userName: result[0].name},{userName: '暂无',userPhone: '暂无',carStatus: true},function (error){
+                    if(error){
+                        throw error;
+                    }else{
+                        res.json({
+                            'status': true
+                        });
+                    }    
+                })
+            });
         });
     }else{
         res.json({
