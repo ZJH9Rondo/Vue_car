@@ -47,6 +47,8 @@
 </style>
 
 <script>
+    import crypto from 'crypto'
+
     export default {
         data () {
             return {
@@ -68,11 +70,15 @@
         methods: {
             handleSubmit() {
               let _this = this;
-              let _url = '/login?user=' + this.formInline.user + '&password=' + this.formInline.password;
+              let sha1 = crypto.createHash('sha1');
               
-              _this.axios({
-                method: 'get',
-                url: _url
+              this.axios({
+                method: 'post',
+                url: '/login',
+                data: {
+                  user: this.formInline.user,
+                  password: sha1.update(_this.formInline.password).digest('hex')
+                }
               }).then(function (response){
                  _this.$Message.success('登录成功!');
                  window.localStorage.setItem('user_token',response.data.token);

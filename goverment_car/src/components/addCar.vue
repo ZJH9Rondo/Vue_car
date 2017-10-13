@@ -2,10 +2,11 @@
   <div class="addcar-page">
     <Form :model="formItem" :label-width="80">
         <FormItem label="车辆拍照">
-            <video id="drive_video" autoplay></video>
-            <canvas id="drive_canvas"></canvas>
-            <Button type="warning" @click="useCamera">启动摄像头</Button>
-            <Button type="primary" @click="getPhoto">拍照</Button>
+            <Modal title="拍照"　v-model="videoflag" @on-ok="ok" @on-cancel="cancel" on-text="拍照" :closable="false">
+                <video id="caradd_video" autoplay></video>    
+            </Modal>
+            <canvas id="caradd_canvas"></canvas>
+            <Button type="warning" style="width: 75%" @click="useCamera">启动摄像头</Button>
         </FormItem>
         <FormItem label="车牌号：">
             <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌" style="width: 80%"></Input>
@@ -25,12 +26,11 @@
     margin-top: 0 !important;
     margin-bottom: 80px;
 }
-#drive_video{
+#caradd_video{
     width: 100%;
-    height: 150px;
-    border: 1px solid #cccccc;
+    height: 250px;
 }
-#drive_canvas{
+#caradd_canvas{
     width: 90%;
     height: 150px;
     margin-left: 35px;
@@ -41,6 +41,7 @@
 export default {
   data() {
       return {
+          videoflag: false,
           formItem: {
               carImage: '',
               carNumber: ''
@@ -48,10 +49,11 @@ export default {
       }
   },methods: {
       useCamera() {
-            var aVideo=document.getElementById('drive_video');
-            var aCanvas=document.getElementById('drive_canvas');
+            var aVideo=document.getElementById('caradd_video');
+            var aCanvas=document.getElementById('caradd_canvas');
             var ctx=aCanvas.getContext('2d');
             
+            this.videoflag = true;
             navigator.getUserMedia  = navigator.getUserMedia ||
                             navigator.webkitGetUserMedia ||
                             navigator.mozGetUserMedia ||
@@ -72,13 +74,16 @@ export default {
                 this.$Message.error(err);
             }
         },
-        getPhoto() {
-            var aVideo=document.getElementById('drive_video');
-            var aCanvas=document.getElementById('drive_canvas');
+        ok() {
+            var aVideo=document.getElementById('caradd_video');
+            var aCanvas=document.getElementById('caradd_canvas');
             var ctx=aCanvas.getContext('2d');
 
             ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
             this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);            
+        },
+        cancel() {
+            this.videoflag = false;
         },
         submitCar(){
             let _this = this;

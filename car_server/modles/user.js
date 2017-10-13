@@ -7,7 +7,8 @@ var UserModule = new Schema({
     phone: String,
     number: String,
     department: String,
-    useStatus: Boolean
+    slat: String,
+    useStatus: {type: Boolean,default: true}
 });
 
 var User = mongoose.model('users',UserModule);

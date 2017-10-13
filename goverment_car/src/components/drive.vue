@@ -1,18 +1,16 @@
 <template>
     <div class="drive-page">
-        <Card style="width:100%"　:bordered="false">
-            <div style="text-align:center">
-                <img src="" alt="">
-                <h3>用车登记</h3>
-            </div>
-        </Card>
-        <Form :model="formItem" :label-width="80">
-            <FormItem label="车辆拍照：">
-                <Modal title='拍照' v-model="videoflag" @on-ok="ok" @on-cancel="cancel" ok-text="拍照">
+        <h3>用车登记</h3>
+        <Form :model="formItem" :label-width="80" style="margin-top: 10px">
+            <FormItem label="车辆拍照：" style="margin-top: 10px">
+                <Modal title='拍照' v-model="videoflag" @on-ok="ok" @on-cancel="cancel" ok-text="拍照" :closable="false">
                     <video id="drive_video" autoplay></video>
                 </Modal>
-                <canvas id="drive_canvas"></canvas>
-                <Button type="warning" @click="useCamera" style="width: 75%">启动摄像头</Button>
+                <div class="canvas-container">
+                    <img id="photo-icon" src="../assets/camera.png">
+                    <canvas id="drive_canvas"></canvas>
+                </div>
+                <Button type="warning" @click="useCamera" style="width: 75%;font-size: 14px;margin-top: 10px">启动摄像头</Button>
             </FormItem>
             <FormItem label="日期控件：">
                 <Row>
@@ -25,17 +23,19 @@
                 <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌"></Input>
             </FormItem>
             <FormItem label="用车定位：">
-                <Input v-model="formItem.userlocation" icon="location" style="width: 80%"></Input>
+                <Input v-model="formItem.userlocation" icon="location" style="max-width: 80%"></Input>
                 <i-switch v-model="formItem.switch"　@on-change="getlocation">
                     <span slot="open">开</span>
                     <span slot="close">关</span>
                 </i-switch>
+                <img src="../assets/Map.png" id="location-icon">
+                <div id="driveMap"></div>
             </FormItem>
             <FormItem label="出行任务：">
                 <Input v-model="formItem.task" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请输入公车出行任务..."></Input>
             </FormItem>
         </Form>
-        <Button type="primary" @click="submitDrive">提交</Button>
+        <Button type="primary" long style="font-size: 16px" @click="submitDrive">提交</Button>
     </div>
 </template>
 
@@ -48,15 +48,35 @@
     margin-right: auto;
     margin-top: 0 !important;
     margin-bottom: 80px;
+    padding-top: 20px; 
 }
 #drive_video{
     width: 100%;
     height: 250px;
 }
-#drive_canvas{
+.canvas-container{
     width: 90%;
     height: 150px;
-    margin-left: 35px;
+    position: relative;
+}
+#photo-icon{
+    position: absolute;
+}
+#drive_canvas{
+    width: 100%;
+    height: 100%;
+    margin-left: 0;
+    border: 1px dotted rgba(38,38,38,143);
+}
+#location-icon{
+   float: left;
+   margin-left: 20%;
+   margin-top: 5%;
+}
+#driveMap{
+    width: 100%;
+    height: 150px;
+    margin-top: 5px;
 }
 </style>
 
@@ -69,9 +89,9 @@
             formItem: {
                 switch: false,
                 carImage: '',
-                useTime: [],
+                useTime: '使用时间',
                 carNumber: '',                
-                userlocation: '经度：0，纬度：0',
+                userlocation: '出发位置',
                 task: ''
             },
             options1: {
@@ -144,10 +164,12 @@
     },
     methods:{
         ok() {
-            var aVideo=document.getElementById('drive_video');
-            var aCanvas=document.getElementById('drive_canvas');
+            var aVideo = document.getElementById('drive_video');
+            var aCanvas = document.getElementById('drive_canvas');
+            var aPhoto = document.getElementById('photo-icon'); 
             var ctx=aCanvas.getContext('2d');
 
+            aPhoto.style.display = 'none';
             ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
             this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
         },
@@ -174,7 +196,7 @@
                 };
                 stream.onended = noStream;
                 aVideo.onloadedmetadata = function () {
-                _this.$Message.success('摄像头成功打开！');
+                    _this.$Message.success('摄像头成功打开！');
                 };
             }
             function noStream(err) {
@@ -184,18 +206,46 @@
         getlocation() {
             var _this = this;
 
-            if(navigator.geolocation && _this.formItem.switch){
-                _this.$Message.success('定位功能已打开！');                
-                navigator.geolocation.getCurrentPosition(function (position){
-                    alert(position.coords);
-                    _this.formItem.userlocation = '经度：'+position.coords.longitude+'，纬度：'+position.coords.latitude;
+            if(_this.formItem.switch){
+                var map,
+                    geolocation,
+                    location_icon = document.getElementById('location-icon');
+
+                location_icon.style.display = 'none';
+                //解析定位结果
+                function onComplete(data) {
+                    _this.formItem.userlocation = data.position.getLng() + '；' + data.position.getLat();
+                    _this.$Message.success('定位成功！');
+                }
+                //解析定位错误信息
+                function onError(data) {
+                    _this.$Message.error('定位失败！');
+                }
+                //加载地图，调用浏览器定位服务
+                map = new AMap.Map('driveMap', {
+                    resizeEnable: true
+                });
+                map.plugin('AMap.Geolocation', function() {
+                    geolocation = new AMap.Geolocation({
+                        enableHighAccuracy: true,//是否使用高精度定位，默认:true
+                        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+                        buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                        zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                        buttonPosition:'RB'
+                    });
+                    map.addControl(geolocation);
+                    geolocation.getCurrentPosition();
+                    AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+                    AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
                 });
             }else{
-                _this.$Message.error('定位功能已关闭！');
+                
             }
         },
         submitDrive() {
             let _this = this;
+            let _userlocation = this.formItem.userlocation.split('；');    
+
             if(window.localStorage.getItem('userNumber')){
                 this.axios({
                 method: 'post',
@@ -204,7 +254,7 @@
                     carImage: this.formItem.carImage,
                     userNumber: window.localStorage.getItem('userNumber'),
                     useTime: [this.formItem.useTime[0],this.formItem.useTime[1]],
-                    userLocation: this.formItem.userLocation,
+                    userLocation: _userlocation,
                     carNumber: this.formItem.carNumber,   
                     task: this.formItem.task,
                     useStatus: false   

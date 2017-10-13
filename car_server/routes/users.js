@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var crypto = require('crypto');
 
 var User = require('../modles/user');
 var Token = require('../config/token');
@@ -34,12 +35,18 @@ router.get('/checktoken',function(req,res,next){
  *  return: Boolean { datatype: JSON && Boolean}
  */
 router.post('/register', function(req, res, next) {
+    var md5 = crypto.createHash('md5');
+    var slat = md5.update('ZJH9Rondo@github.com').digest('hex');
+    var hmac = crypto.createHmac('sha256',slat); // 密码加密存储
+    req.body.password = hmac.update(req.body.password).digest('hex');
+
     var UserAdd = new User({
       name: req.body.name,
       password: req.body.password,
       phone: req.body.phone,
       number: req.body.number,
-      department: req.body.department
+      department: req.body.department,
+      slat: slat
     });
 
     UserAdd.save(function(err) {
@@ -62,12 +69,14 @@ router.post('/register', function(req, res, next) {
  *  params: number & password
  *  return: Boolean { datatype: JSON && Boolean}
  */
-router.get('/login',function(req,res,next) {
-    User.find({number: req.query.user}).exec(function(err,result) {
-      if(result[0].password === req.query.password){
+router.post('/login',function(req,res,next) {  
+    User.find({number: req.body.user}).exec(function(err,result) {
+      var hmac = crypto.createHmac('sha256',result[0].slat);
+      req.body.password = hmac.update(req.body.password).digest('hex');
+      
+      if(result[0].password === req.body.password){
         var _token = Token.crate();
 
-        console.log(_token);
         res.json({
           'token': _token,
           'status': true 

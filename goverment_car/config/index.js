@@ -22,70 +22,70 @@ module.exports = {
     bundleAnalyzerReport: process.env.npm_config_report
   },
   dev: {
-    env: require('./prod.env'),
+    env: require('./dev.env'),
     port: 8000,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
       '/register': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/register': '/register'
         }
       },
       '/login': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/login': '/login'
         }
       },
       '/checktoken': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/checktoken': '/checktoken'
         }
       },
       '/drive': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/drive': '/drive'
         }
       },
       '/finishlist': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/finishlist': '/finishlist'
         }
       },
       '/unfinishlist': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/unfinishlist': '/unfinishlist'
         }
       },
       '/usefinish': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/usefinish': '/usefinish'
         }
       },
       '/addcar': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/addcar': '/addcar'
         }
       },
       '/carlist': {
-        target: 'http://115.159.193.226:3001',
+        target: 'http://localhost:3000',
         changerOrigin: true,
         pathRewrite: {
           '^/carlist': '/carlist'

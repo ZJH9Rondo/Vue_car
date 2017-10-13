@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <mt-header fixed title="政府公车管理系统">
+    <mt-header fixed title="政府公车管理系统" style="height: 45px;z-index:9999">
       <mt-button slot="left" @click="usermenu">
         <Icon type="person" :size="24"></Icon>
       </mt-button>
@@ -11,18 +11,18 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
-    <mt-tabbar fixed>
+    <mt-tabbar fixed style="z-index:9999">
       <!-- img=100*100.png -->
       <mt-tab-item id="公车状态">
-        <img slot="icon" src="" @click="golist()">
+        <img slot="icon" src="./assets/carlist.png" @click="golist()">
         公车状态
       </mt-tab-item>
       <mt-tab-item id="我要用车">
-        <img slot="icon" src="" @click="godrive()">
+        <img slot="icon" src="./assets/drive.png" @click="godrive()">
         我要用车
       </mt-tab-item>
       <mt-tab-item id="个人中心">
-        <img slot="icon" src="" @click="gouser()">
+        <img slot="icon" src="./assets/user.png" @click="gouser()">
         个人中心
       </mt-tab-item>
     </mt-tabbar>
@@ -60,7 +60,7 @@ export default {
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

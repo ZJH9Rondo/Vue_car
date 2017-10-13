@@ -1,6 +1,6 @@
 <template>
   <div class="carlist-page">
-    <div class="carlist-item" v-for="(item,index) in carShowlist" :key="index">
+    <div class="carlist-item" v-for="(item,index) in carShowlist" :key="index" @click="showMap(item)">
         <div class="item-image">
             <img :src="item.carImage" alt="公车图片" />
         </div>
@@ -11,6 +11,16 @@
         </div>
         <div class="clear"></div>
     </div>
+     <Modal v-model="Mapflag">
+        <p slot="header" style="color:#f60;text-align:center">
+            <Icon type="ios-navigate"></Icon>
+            <span>车辆当前位置</span>
+        </p>
+        <div id="carMap"></div>
+        <div slot="footer">
+            <Button type="warning" long @click="closeMap" style="font-size: 16px">关闭</Button>
+        </div>
+    </Modal>
     <BackTop :bottom="70">
         <div class="top">返回顶端</div>
     </BackTop>
@@ -23,7 +33,7 @@
 
 <style scoped>
 .carlist-page{
-    width: 98%;
+    width: 96%;
     height: auto;
     margin-left: auto;
     margin-right: auto;
@@ -31,6 +41,7 @@
 }
 .carlist-item{
     margin-top: 10px;
+    /* border-bottom: 1px solid rgba(38, 38, 38, 42); */
 }
 .item-image{
     width: 30%;
@@ -83,7 +94,11 @@
     height: 35px;
     animation: ani-demo-spin 1s linear infinite;
 }
-
+#carMap{
+    width: 100%;
+    height: 250px;
+    min-height: 200px;
+}
 /* 加载动画 */
 @keyframes ani-demo-spin {
     from { transform: rotate(0deg);}
@@ -96,7 +111,8 @@
 export default {
     data() {
       return {
-           carShowlist: []
+            Mapflag: false,
+            carShowlist: []
         }
     },
     created() {
@@ -151,6 +167,36 @@ export default {
                     throw error;
                 }
             });
+        },
+        showMap(item) {
+            let _this = this;
+            console.log(item);
+
+            if(item.carStatus === '空闲'){
+                this.$Message.success('该车目前可用，无定位信息！');
+            }else{
+                // 调用百度地图API
+                this.Mapflag = true;
+                 var map, geolocation;
+                //加载地图，调用浏览器定位服务
+                map = new AMap.Map('carMap', {
+                    resizeEnable: true
+                });
+                map.plugin('AMap.Geolocation', function() {
+                    geolocation = new AMap.Geolocation({
+                        enableHighAccuracy: true,//是否使用高精度定位，默认:true
+                        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+                        buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                        zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                        buttonPosition:'RB'
+                    });
+                    map.addControl(geolocation);
+                    geolocation.getCurrentPosition();
+                });
+            }
+        },
+        closeMap() {
+            this.Mapflag = false;
         }
     }
 }
