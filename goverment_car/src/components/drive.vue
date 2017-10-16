@@ -1,18 +1,18 @@
 <template>
     <div class="drive-page">
-        <h3>用车登记</h3>
+        <h2>用车登记</h2>
         <Form :model="formItem" :label-width="80" style="margin-top: 10px">
             <FormItem label="车辆拍照：" style="margin-top: 10px">
-                <Modal title='拍照' v-model="videoflag" @on-ok="ok" @on-cancel="cancel" ok-text="拍照" :closable="false">
+                <Modal title='拍照' v-model="videoflag" @on-ok="takePhoto" @on-cancel="closeCamera" ok-text="拍照" :closable="false">
                     <video id="drive_video" autoplay></video>
                 </Modal>
                 <div class="canvas-container">
                     <img id="photo-icon" src="../assets/camera.png">
                     <canvas id="drive_canvas"></canvas>
                 </div>
-                <Button type="warning" @click="useCamera" style="width: 75%;font-size: 14px;margin-top: 10px">启动摄像头</Button>
+                <Button type="warning" @click="useCamera" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px">启动摄像头</Button>
             </FormItem>
-            <FormItem label="日期控件：">
+            <FormItem label="使用日期：">
                 <Row>
                    <Col span="12">
                      <DatePicker v-model="formItem.useTime" type="daterange" :options="options2" placement="top-end" placeholder="选择日期" style="width: 200px"></DatePicker>
@@ -28,8 +28,10 @@
                     <span slot="open">开</span>
                     <span slot="close">关</span>
                 </i-switch>
-                <img src="../assets/Map.png" id="location-icon">
-                <div id="driveMap"></div>
+                <div class="map-container">
+                    <img src="../assets/Map.png" id="location-icon">
+                    <div id="driveMap"></div>
+                </div>
             </FormItem>
             <FormItem label="出行任务：">
                 <Input v-model="formItem.task" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请输入公车出行任务..."></Input>
@@ -58,24 +60,43 @@
     width: 90%;
     height: 150px;
     position: relative;
+    border: 1px solid #cccccc;
+    background-color: rgba(39, 40,34, 0.4);
+    border-radius: 8px;
 }
 #photo-icon{
     position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0; 
+    right: 0; 
+    margin: auto;
 }
 #drive_canvas{
     width: 100%;
     height: 100%;
     margin-left: 0;
-    border: 1px dotted rgba(38,38,38,143);
+}
+.map-container{
+    width: 100%;
+    height: 150px;
+    margin-top: 5px;
+    position: relative;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    background-color: rgba(39, 40,34, 0.2);
 }
 #location-icon{
-   float: left;
-   margin-left: 20%;
-   margin-top: 5%;
+   position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0; 
+    right: 0; 
+    margin: auto;
 }
 #driveMap{
     width: 100%;
-    height: 150px;
+    height: 100%;
     margin-top: 5px;
 }
 </style>
@@ -163,7 +184,7 @@
         }
     },
     methods:{
-        ok() {
+        takePhoto() {
             var aVideo = document.getElementById('drive_video');
             var aCanvas = document.getElementById('drive_canvas');
             var aPhoto = document.getElementById('photo-icon'); 
@@ -173,7 +194,7 @@
             ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
             this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
         },
-        cancel() {
+        closeCamera() {
             this.videoflag = false;
         },
         useCamera() {
@@ -182,6 +203,7 @@
             var ctx=aCanvas.getContext('2d');
             var _this = this;
 
+            aCanvas.style.border = '0';
             this.videoflag = true;
             navigator.getUserMedia  = navigator.getUserMedia ||
                             navigator.webkitGetUserMedia ||
@@ -205,7 +227,9 @@
         },
         getlocation() {
             var _this = this;
+            var _mapContainer = document.getElementsByClassName('map-container');
 
+            _mapContainer[0].style.border = '0';
             if(_this.formItem.switch){
                 var map,
                     geolocation,
@@ -258,8 +282,8 @@
                     carNumber: this.formItem.carNumber,   
                     task: this.formItem.task,
                     useStatus: false   
-                    }
-                }).then(function (response){
+                }
+            }).then(function (response){
                     switch(response.data.status){
                         case 1 :  _this.$Message.success('登记成功！');                        
                                     setTimeout(function() {

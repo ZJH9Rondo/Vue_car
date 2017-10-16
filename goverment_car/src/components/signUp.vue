@@ -45,22 +45,88 @@
 
 
 <script>
-    import crypto from 'crypto'
+    import crypto from 'crypto' // 加密模块
 
     export default {
         data () {
              let _this = this;
-             var validatePass=(rule, value, callback) => {
+             /*
+             *  用户名校验
+             */
+             var checkUserName=(rule,value,callback) => {
+                     if(value === ''){
+                        callback(new Error('请输入姓名'));
+                     }else{
+                        var partern = /^[\u4E00-\u9FA5\uf900-\ufa2d]{2,8}$/;
+                        if(!partern.test(_this.formValidate.name)){
+                            callback(new Error('姓名格式错误'));
+                        }else{
+                            callback();
+                        }
+                     }
+                 };
+            /*
+            *   校验政务编号
+            */
+             var checkUserNumber=(rule,value,callback) => {
+                 if(value === ''){
+                     callback(new Error('请输入政务编号'));
+                 }else{
+                     var partern = /^\d{8}$/;
+                     if(!partern.test(_this.formValidate.number)){
+                         callback(new Error('编号格式错误'));
+                     }else{
+                         callback();
+                     }
+                 }
+             };           
+             /*
+             *  校验手机号
+             */
+            var checkPhone = (rule,value,callback) => {
+                if(value === ''){
+                     callback(new Error('请输入手机号'));
+                 }else{
+                     var partern = /^1[34578]\d{9}$/;
+                     if(!partern.test(_this.formValidate.phone)){
+                         callback(new Error('手机号格式错误'));
+                     }else{
+                         callback();
+                     }
+                 }
+            };
+            /*
+             *  校验部门名称
+             */
+            var checkDepartment = (rule,value,callback) => {
+                if(value === ''){
+                     callback(new Error('请输入部门名称'));
+                 }else{
+                     var partern = /^[\u4E00-\u9FA5\uf900-\ufa2d]{3,11}$/;
+                     if(!partern.test(_this.formValidate.department)){
+                         callback(new Error('请输入正确的部门名称'));
+                     }else{
+                         callback();
+                     }
+                 }
+            };
+            /*
+            *   校验密码
+            */ 
+            var validatePass=(rule, value, callback) => {
                     if (value === '') {
                         callback(new Error('请输入密码'));
                     } else {
-                        if (_this.formValidate.passwordCheck !== '') {
+                        if(_this.formValidate.passwordCheck !== '') {
                             // 对第二个密码框单独验证
                             _this.$refs.formValidate.validateField('passwordCheck');
                         }
                         callback();
                     }
                 };
+            /*
+            *   密码二次校验
+            */
             var validatePassCheck=(rule, value, callback) => {
                     if (value === '') {
                         callback(new Error('请再次输入密码'));
@@ -69,7 +135,7 @@
                     } else {
                         callback();
                     }
-            };
+                };
             return {
                 formValidate: {
                     name: '',
@@ -81,22 +147,22 @@
                 },
                 ruleValidate: {
                     name: [
-                        { required: true, message: '姓名不能为空', trigger: 'blur' }
+                        { validator: checkUserName, trigger: 'blur' }
                     ],
                     password: [
-                        {validator: validatePass, trigger: 'blur' }
+                        { validator: validatePass, trigger: 'blur' }
                     ],
-                    passwdCheck: [
-                        {validator: validatePassCheck, trigger: 'blur'}
+                    passwordCheck: [
+                        { validator: validatePassCheck, trigger: 'blur'}
                     ],
                     number: [
-                        { required: true, message: '编号不能为空', trigger: 'blur' },
+                        { validator: checkUserNumber, trigger: 'blur' },
                     ],
                     phone: [
-                        { required: true, message: '手机号不能为空', trigger: 'blur' }
+                        { validator: checkPhone, trigger: 'blur' }
                     ],
                     department: [
-                        { required: true, message: '请输入部门名称', trigger: 'blur' },
+                        { validator: checkDepartment, trigger: 'blur' },
                     ]
                 }
             }

@@ -1,14 +1,15 @@
 <template>
   <div class="user-page">
-      <Card style="width:100%" :bordered="false">
-        <div style="text-align:center">
-            <img src="" >
-            <h3>用户：{{userNumber}}</h3>
-        </div>
-     </Card>
+     <div class="user-title">
+        <img class="user-front" src="../assets/userfront.png" alt="">
+        <h3 class="user-number">{{userNumber}}</h3>
+     </div>
      <div class="user-menu">
          <div class="choose-item" @click="usedflag = true">
-            <p>用车记录</p>
+            <p>
+                <Icon type="clipboard" :size="24" color="#26A2FF"></Icon>
+                <span style="margin-left: 5px">用车记录</span>
+            </p>
             <Icon type="chevron-right" class="choose-item-icon" :size=" 16"/>
             <div></div>
          </div>
@@ -25,7 +26,10 @@
             </div>
          </Modal>
          <div class="choose-item" @click="usingflag = true">
-             <p>在用车辆</p>
+             <p>
+                <Icon type="clock" :size="23" color="#26A2FF"></Icon>
+                <span style="margin-left: 2px">在用车辆</span>    
+            </p>
              <Icon type="chevron-right" class="choose-item-icon" :size=" 16"/>
              <div></div>
          </div>
@@ -49,17 +53,33 @@
 
 <style scoped>
 .user-page{
-    width: 95%;
+    width: 100%;
     height: auto;
     min-height: 100%;
+    margin-top: 0 !important;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 60px;
 }
+.user-title{
+    width: 100%;
+    height: 180px;
+    background: #26A2FF;
+}
+.user-number{
+    font-size: 22px;
+    margin-top: 10px;
+    color: white;
+}
+.user-front{
+    width: 80px;
+    height: 80px;
+    margin-top: 20px;
+}
 .user-menu{
     width: 98%;
     height: auto;
-    margin-top: 10px;
+    margin-top: 20px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -75,7 +95,7 @@
 }
 .choose-item>p{
     float: left;
-    font-size: 16px;
+    font-size: 17px;
     padding-left: 10px;
 }
 .choose-item-icon{
@@ -91,7 +111,7 @@
     height: 110px;
 }
 .item-image{
-    width: 30%;
+    width: 40%;
     height: 100px;
     float: left;
 }
@@ -101,7 +121,7 @@
 }
 .item-content{
     float: right;
-    width: 70%;
+    width: 60%;
     height: 100px;
     margin-bottom: 5px;
 }
@@ -130,7 +150,7 @@
     height: 40px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 88%;
+    margin-top: 60%;
 }
 .vertical-center-modal{
     display: flex;

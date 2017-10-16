@@ -1,18 +1,21 @@
 <template>
   <div class="addcar-page">
-    <Form :model="formItem" :label-width="80">
+    <Form :model="formItem" :rules="ruleValidate" :label-width="80">
         <FormItem label="车辆拍照">
-            <Modal title="拍照"　v-model="videoflag" @on-ok="ok" @on-cancel="cancel" on-text="拍照" :closable="false">
+            <Modal title="拍照"　v-model="videoflag" @on-ok="ok" @on-cancel="cancel" ok-text="拍照" :closable="false">
                 <video id="caradd_video" autoplay></video>    
             </Modal>
-            <canvas id="caradd_canvas"></canvas>
-            <Button type="warning" style="width: 75%" @click="useCamera">启动摄像头</Button>
+            <div class="canvas-container">
+                <img id="photo-icon" src="../assets/camera.png">
+                <canvas id="caradd_canvas"></canvas>
+            </div>
+            <Button type="warning" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px" @click="useCamera">启动摄像头</Button>
         </FormItem>
-        <FormItem label="车牌号：">
-            <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌" style="width: 80%"></Input>
+        <FormItem label="车牌号：" prop="carNumberCheck">
+            <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌"></Input>
         </FormItem>
     </Form>
-    <Button type="primary" @click="submitCar">提交</Button>
+    <Button type="primary" @click="submitCar" style="width: 98%;font-size: 15px">注册车辆</Button>
   </div>
 </template>
 
@@ -23,12 +26,28 @@
     min-height: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 0 !important;
+    margin-top: 70px !important;
     margin-bottom: 80px;
 }
 #caradd_video{
     width: 100%;
     height: 250px;
+}
+.canvas-container{
+    width: 90%;
+    height: 150px;
+    position: relative;
+    background-color: rgba(39, 40,34, 0.4);
+    border: 1px solid #cccccc;;
+    border-radius: 8px;
+}
+#photo-icon{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0; 
+    right: 0; 
+    margin: auto;
 }
 #caradd_canvas{
     width: 90%;
@@ -40,11 +59,30 @@
 <script>
 export default {
   data() {
+      let _this = this;
+      var checkCarNumber = (rule,value,callback) => {
+          if(value === ''){
+              callback(new Error('请输入车牌号'));
+          }else{
+              var partern = /^[0-9a-zA-Z]{5}$/;
+              if(!partern.test(_this.formItem.carNumber)){
+                  callback(new Error('车牌号格式错误'));
+              }else{
+                  callback();
+              }
+          }
+      };
+
       return {
           videoflag: false,
           formItem: {
               carImage: '',
               carNumber: ''
+          },
+          ruleValidate: {
+              carNumberCheck: [
+                  {validator: checkCarNumber , trigger: 'blur'}
+              ]
           }
       }
   },methods: {

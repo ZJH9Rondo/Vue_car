@@ -74,7 +74,6 @@ router.get('/finishlist',function(req,res,next) {
 
     if(checkToken(token)){
         driveModule.find({userNumber: req.query.userNumber}).exec(function (err,result){
-            console.log(result);
             var finishlist = [];
             for(var i=0;i<result.length;i++){
                if(result[i].useStatus){

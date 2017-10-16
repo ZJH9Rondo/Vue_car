@@ -13,19 +13,22 @@ var Token = require('../config/token');
  */
 router.get('/checktoken',function(req,res,next){
   var token = req.body.token || req.query.token || req.headers['token'];
-  var flag = Token.check(token);
-  
-  if(flag){
-    console.log(flag);
-    res.json({
-      'status': true
-    });
-  }else{
-    console.log(flag);
-    res.json({
-      'status': false
-    });
-  }
+  var msg = Token.check(token);
+  var flag;
+
+  User.findOne({number: msg}).exec(function (err,result){
+      if(err || !result){
+          flag = false;
+          res.json({
+            'status': false
+          });
+      }else{
+          res.json({
+            'status': true
+          });
+          flag = true;
+      }   
+  });
 });
 
 /*
@@ -75,7 +78,7 @@ router.post('/login',function(req,res,next) {
       req.body.password = hmac.update(req.body.password).digest('hex');
       
       if(result[0].password === req.body.password){
-        var _token = Token.crate();
+        var _token = Token.crate(req.body.user);
 
         res.json({
           'token': _token,
