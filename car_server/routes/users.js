@@ -14,11 +14,9 @@ var Token = require('../config/token');
 router.get('/checktoken',function(req,res,next){
   var token = req.body.token || req.query.token || req.headers['token'];
   var msg = Token.check(token);
-  var flag;
 
   User.findOne({number: msg}).exec(function (err,result){
       if(err || !result){
-          flag = false;
           res.json({
             'status': false
           });
@@ -26,7 +24,6 @@ router.get('/checktoken',function(req,res,next){
           res.json({
             'status': true
           });
-          flag = true;
       }   
   });
 });
