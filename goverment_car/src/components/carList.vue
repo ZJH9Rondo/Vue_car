@@ -49,11 +49,11 @@
     float: left;
 }
 .item-image>img{
-    width: 120%;
+    width: 100%;
     height: 100%;
 }
 .item-content{
-    width: 70%;
+    width: 67%;
     height: 100%;
     float: right;
     text-align: left;

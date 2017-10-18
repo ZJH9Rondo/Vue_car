@@ -3,14 +3,11 @@
         <h2>用车登记</h2>
         <Form :model="formItem" :label-width="80" style="margin-top: 10px">
             <FormItem label="车辆拍照：" style="margin-top: 10px">
-                <Modal title='拍照' v-model="videoflag" @on-ok="takePhoto" @on-cancel="closeCamera" ok-text="拍照" :closable="false">
-                    <video id="drive_video" autoplay></video>
-                </Modal>
                 <div class="canvas-container">
                     <img id="photo-icon" src="../assets/camera.png">
                     <canvas id="drive_canvas"></canvas>
                 </div>
-                <Button type="warning" @click="useCamera" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px">启动摄像头</Button>
+                <Button type="warning" @click="takePhoto" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px">启动摄像头</Button>
             </FormItem>
             <FormItem label="使用日期：">
                 <Row>
@@ -51,10 +48,6 @@
     margin-top: 0 !important;
     margin-bottom: 80px;
     padding-top: 20px; 
-}
-#drive_video{
-    width: 100%;
-    height: 250px;
 }
 .canvas-container{
     width: 90%;
@@ -100,7 +93,6 @@
     margin-top: 5px;
 }
 </style>
-
 
 <script>
  export default {
@@ -185,45 +177,66 @@
     },
     methods:{
         takePhoto() {
-            var aVideo = document.getElementById('drive_video');
-            var aCanvas = document.getElementById('drive_canvas');
-            var aPhoto = document.getElementById('photo-icon'); 
-            var ctx=aCanvas.getContext('2d');
-
-            aPhoto.style.display = 'none';
-            ctx.drawImage(aVideo, 0, 0,200,150);//将获取视频绘制在画布上
-            this.formItem.carImage = aCanvas.toDataURL('image/png').substr(22);           
-        },
-        closeCamera() {
-            this.videoflag = false;
-        },
-        useCamera() {
-            var aVideo=document.getElementById('drive_video');
-            var aCanvas=document.getElementById('drive_canvas');
-            var ctx=aCanvas.getContext('2d');
+            var _cameraInput = document.createElement('input');
             var _this = this;
 
-            aCanvas.style.border = '0';
-            this.videoflag = true;
-            navigator.getUserMedia  = navigator.getUserMedia ||
-                            navigator.webkitGetUserMedia ||
-                            navigator.mozGetUserMedia ||
-                            navigator.msGetUserMedia;//获取媒体对象（这里指摄像头）
-            navigator.getUserMedia({video:true}, gotStream, noStream);//参数1获取用户打开权限；参数二成功打开后调用，并传一个视频流对象，参数三打开失败后调用，传错误信息
+            _cameraInput.id = 'drive_camera';
+            _cameraInput.type = 'file';
+            _cameraInput.accept = 'image/*';
+            _cameraInput.capture = 'camera';
             
-            function gotStream(stream) {
-                aVideo.src = URL.createObjectURL(stream);
-                aVideo.onerror = function () {
-                stream.stop();
-                };
-                stream.onended = noStream;
-                aVideo.onloadedmetadata = function () {
-                    _this.$Message.success('摄像头成功打开！');
-                };
-            }
-            function noStream(err) {
-                _this.$Message.error(err);
-            }
+            _cameraInput.addEventListener('change',function (event){
+                var _canvas = document.getElementById('drive_canvas'),
+                    _photoIcon = document.getElementById('photo-icon'),
+                    _canvasContainer = document.getElementsByClassName('canvas-container'),
+                    e = event || window.event;
+                
+                var files = e.target.files;
+                _photoIcon.style.display = 'none';
+                _canvasContainer[0].style.backgroundColor = 'white';
+
+                if(files && files.length>0){
+                    var file = files[0],
+                        img = new Image();
+                    
+                    /*
+                    * 防止浏览器不支持　fileReader方法 
+                    */
+                    try{
+                        // get window.URL object                            
+                            var URL = window.URL || window.webkitURL,
+                                imgURL = URL.createObjectURL(file);
+                            
+                            img.src = imgURL;
+                            img.onload = function (){
+                                _canvas.getContext('2d').drawImage(img,0,0,350,150);
+                                _this.$Message.success('照片提交成功！');                                
+                                _this.formItem.carImage = _canvas.toDataURL();
+                            }
+                    }catch(e){
+                        try{
+                            var fileReader = new fileReader();
+
+                                fileReader.onload = function (event){
+                                    var e = event || window.event;
+
+                                    img.src = e.target.result;
+                                    _canvas.getContext('2d').drawImage(img,0,0,350,150);
+                                    _this.$Message.success('照片提交成功！');                                    
+                                    _this.formItem.carImage = _canvas.toDataURL();
+                                }
+                                fileReader.readAsDataURL(file);
+                        }catch(e){
+                            _this.$Message.error('浏览器不支持，请更换浏览器访问操作！');
+                        }
+                    }
+                }
+            },false);
+
+            this.$Message.warning('正在打开摄像头...');                                    
+            setTimeout(function() {
+                _cameraInput.click();
+            }, 1000);
         },
         getlocation() {
             var _this = this;

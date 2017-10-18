@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <mt-header fixed title="政府公车管理系统" style="height: 45px;z-index:99">
+    <mt-header fixed title="政府公车管理系统" style="height: 45px;z-index:999">
       <mt-button slot="left" @click="usermenu">
         <Icon type="person" :size="24"></Icon>
       </mt-button>
@@ -11,7 +11,7 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
-    <mt-tabbar fixed style="z-index:99">
+    <mt-tabbar fixed style="z-index:999">
       <!-- img=100*100.png -->
       <mt-tab-item id="公车状态">
         <img slot="icon" src="./assets/carlist.png" @click="golist()">
