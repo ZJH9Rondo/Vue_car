@@ -240,13 +240,13 @@
         },
         getlocation() {
             var _this = this;
-            var _mapContainer = document.getElementsByClassName('map-container');
+            var _mapContainer = document.getElementsByClassName('map-container'),
+                 location_icon = document.getElementById('location-icon');
 
             _mapContainer[0].style.border = '0';
             if(_this.formItem.switch){
                 var map,
-                    geolocation,
-                    location_icon = document.getElementById('location-icon');
+                    geolocation;
 
                 location_icon.style.display = 'none';
                 //解析定位结果
@@ -276,7 +276,7 @@
                     AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
                 });
             }else{
-                
+                _this.$Message.error('定位已关闭！');
             }
         },
         submitDrive() {

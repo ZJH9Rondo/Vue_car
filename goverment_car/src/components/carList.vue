@@ -1,6 +1,6 @@
 <template>
   <div class="carlist-page">
-    <div class="carlist-item" v-for="(item,index) in carShowlist" :key="index" @click="showMap(item)">
+    <div class="carlist-item" v-for="(item,index) in carShowlist" :key="index" @click="getlocation(item)">
         <div class="item-image">
             <img :src="item.carImage" alt="公车图片" />
         </div>
@@ -11,12 +11,12 @@
         </div>
         <div class="clear"></div>
     </div>
-     <Modal v-model="Mapflag">
+    <Modal v-model="Mapflag">
         <p slot="header" style="color:#f60;text-align:center">
             <Icon type="ios-navigate"></Icon>
             <span>车辆当前位置</span>
         </p>
-        <div id="carMap"></div>
+        <div id="Map"></div>
         <div slot="footer">
             <Button type="warning" long @click="closeMap" style="font-size: 16px">关闭</Button>
         </div>
@@ -33,15 +33,15 @@
 
 <style scoped>
 .carlist-page{
-    width: 96%;
+    width: 99%;
     height: auto;
+    margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 55px; 
 }
 .carlist-item{
     margin-top: 10px;
-    /* border-bottom: 1px solid rgba(38, 38, 38, 42); */
 }
 .item-image{
     width: 30%;
@@ -94,7 +94,7 @@
     height: 35px;
     animation: ani-demo-spin 1s linear infinite;
 }
-#carMap{
+#Map{
     width: 100%;
     height: 250px;
     min-height: 200px;
@@ -168,31 +168,26 @@ export default {
                 }
             });
         },
-        showMap(item) {
-            let _this = this;
-            console.log(item);
+        getlocation(item) {
+            this.Mapflag = true;
 
-            if(item.carStatus === '空闲'){
-                this.$Message.success('该车目前可用，无定位信息！');
-            }else{
-                // 调用百度地图API
-                this.Mapflag = true;
-                 var map, geolocation;
-                //加载地图，调用浏览器定位服务
-                map = new AMap.Map('carMap', {
-                    resizeEnable: true
+            if(this.Mapflag){
+                var _this = this,
+                    _position = [Number(item.position[0]),Number(item.position[1])],
+                    map,
+                    marker;
+
+                console.log(_position);
+                map = new AMap.Map('Map', {
+                    resizeEnable: true,
+                    zoom:17,
+                    center: _position
                 });
-                map.plugin('AMap.Geolocation', function() {
-                    geolocation = new AMap.Geolocation({
-                        enableHighAccuracy: true,//是否使用高精度定位，默认:true
-                        timeout: 10000,          //超过10秒后停止定位，默认：无穷大
-                        buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
-                        zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
-                        buttonPosition:'RB'
-                    });
-                    map.addControl(geolocation);
-                    geolocation.getCurrentPosition();
+                marker = new AMap.Marker({
+                    position: _position
                 });
+
+                marker.setMap(map);
             }
         },
         closeMap() {

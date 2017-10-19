@@ -6,6 +6,7 @@ var carModule = new Schema({
     carNumber: String,
     userName: {type: String,default: '暂无'},
     userPhone: {type: String,default: '暂无'},
+    position: {type: Array,default: [116.40, 39.91]},
     carStatus: Boolean
 });
 

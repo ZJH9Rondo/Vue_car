@@ -38,7 +38,7 @@ router.post('/drive',function (req,res,next){
                     carModule.find({carNumber: req.body.carNumber}).exec(function (err,result){
                         console.log(result);
                         if(result[0].carStatus){
-                            carModule.update({carNumber: req.body.carNumber},{userName: _userTarget.name,userPhone: _userTarget.phone,carStatus: req.body.useStatus},function (error){
+                            carModule.update({carNumber: req.body.carNumber},{userName: _userTarget.name,userPhone: _userTarget.phone,position: req.body.userLocation,carStatus: req.body.useStatus},function (error){
                                 if(error){
                                     throw error;
                                 }else{
@@ -140,7 +140,7 @@ router.get('/usefinish',function (req,res,next){
                     throw err;
                 }
 
-                carModule.update({userName: result[0].name},{userName: '暂无',userPhone: '暂无',carStatus: true},function (error){
+                carModule.update({userName: result[0].name},{userName: '暂无',userPhone: '暂无',position: [116.40, 39.91],carStatus: true},function (error){
                     if(error){
                         throw error;
                     }else{
