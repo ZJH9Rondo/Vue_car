@@ -16,13 +16,13 @@
          <Modal title="用车历史记录" v-model="usedflag" :mask-closable="false"  class-name="vertical-center-modal"> 
             <div class="list-container">
                 <div v-for="(item,index) in usedlist" :key="index" class="list-item" >
-                <div class="item-image">
-                    <img :src="item.carImage" alt="">
+                    <div class="item-image">
+                        <img :src="item.carImage" alt="">
+                    </div>
+                    <div class="item-content">
+                        <p class="content">任务：{{item.task}}</p>
+                    </div>
                 </div>
-                <div class="item-content">
-                    <p class="content">任务：{{item.task}}</p>
-                </div>
-            </div>
             </div>
          </Modal>
          <div class="choose-item" @click="usingflag = true">
@@ -41,7 +41,7 @@
                     </div>
                     <div class="item-content">
                         <p class="content">任务：{{item.task}}</p>
-                        <Button class="use-finish" type="success" @click="drive_END(item)">结束用车</Button>
+                        <Button class="use-finish" type="success" @click="driveEnd(item,index)">结束用车</Button>
                     </div>
                 </div>
              </div>
@@ -187,9 +187,6 @@ export default {
             url: _finishURL
         }).then(function (response){
             _this.usedlist = response.data.list;
-            for(var i=0;i < _this.usedlist.length;i++){
-                _this.usedlist[i].carImage ='data:image/png;base64,' + _this.usedlist[i].carImage;
-            }
         }).catch(function (error){
             throw error;
         });
@@ -199,9 +196,6 @@ export default {
             url: _unfinishURL
         }).then(function (response){
             _this.usinglist = response.data.list;
-            for(var i=0;i <_this.usinglist.length;i++){
-                _this.usinglist[i].carImage ='data:image/png;base64,' + _this.usinglist[i].carImage;  
-           }
         }).catch(function (error){
             throw error;
         });
@@ -212,8 +206,7 @@ export default {
             window.localStorage.removeItem('userNumber');
             this.$router.push('/signin');
         },
-        drive_END(item) {
-            console.log(item);
+        driveEnd(item,index) {
             var drive_endURL = '/usefinish?driveId=' + item._id +'&userNumber=' + item.userNumber;
             var _this = this;
 
@@ -223,6 +216,7 @@ export default {
             }).then(function (response){
                 if(response.data.status){
                     _this.$Message.success('操作成功！');
+                    _this.usinglist.splice(index,1);
                 }else{
                     _this.$Message.error('操作失败！');
                 }

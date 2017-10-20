@@ -90,6 +90,13 @@ module.exports = {
         pathRewrite: {
           '^/carlist': '/carlist'
         }
+      },
+      '/checkCarNumber': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/carlist': '/checkCarNumber'
+        }
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"

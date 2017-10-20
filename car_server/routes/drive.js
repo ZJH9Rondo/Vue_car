@@ -7,6 +7,42 @@ var userModule = require('../modles/user');
 var checkToken = require('../config/token').check;
 
 /*
+ *  method: GET
+ *  url: ' /checkCarNumber '
+ *  params: carNumber
+ *  return: Boolean { datatype: JSON && Boolean}
+ */
+router.get('/checkCarNumber',function (req,res,next){
+    var _carNumber = req.query.carNumber;
+
+    if(_carNumber){
+        carModule.find({carNumber: _carNumber}).exec(function (err,result) {
+            console.log(result);
+           if(err){
+               res.statusCode = 500;
+               res.json({
+                   'status': false
+               });
+           }
+           
+           if(result.length === 1){
+               res.json({
+                   'status': true
+               });
+           }else{
+               res.json({
+                   'status': false
+               });
+           }
+        });
+    }else{
+        res.json({
+            'err_Msg': 'params is wrong, Please check and try again!'
+        });
+    }
+});
+
+/*
  *  method: POST
  *  url: ' /drive '
  *  params: carImage & userName & useTime & userLocation & task & useStatus & carNumber &userPhone
@@ -140,7 +176,7 @@ router.get('/usefinish',function (req,res,next){
                     throw err;
                 }
 
-                carModule.update({userName: result[0].name},{userName: '暂无',userPhone: '暂无',position: [116.40, 39.91],carStatus: true},function (error){
+                carModule.update({userName: result[0].name},{userName: '暂无',userPhone: '暂无',carStatus: true},function (error){
                     if(error){
                         throw error;
                     }else{

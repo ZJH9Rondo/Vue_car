@@ -1,27 +1,27 @@
 <template>
     <div class="drive-page">
         <h2>用车登记</h2>
-        <Form :model="formItem" :label-width="80" style="margin-top: 10px">
-            <FormItem label="车辆拍照：" style="margin-top: 10px">
+        <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" style="margin-top: 10px">
+            <FormItem label="拍照：" style="margin-top: 10px" prop="carImage">
                 <div class="canvas-container">
                     <img id="photo-icon" src="../assets/camera.png">
                     <canvas id="drive_canvas"></canvas>
                 </div>
                 <Button type="warning" @click="takePhoto" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px">启动摄像头</Button>
             </FormItem>
-            <FormItem label="使用日期：">
+            <FormItem label="时间段：">
                 <Row>
                    <Col span="12">
-                     <DatePicker v-model="formItem.useTime" type="daterange" :options="options2" placement="top-end" placeholder="选择日期" style="width: 200px"></DatePicker>
+                     <DatePicker v-model="formValidate.useTime" type="daterange" :options="options2" placement="top-end" placeholder="用车时间" style="width: 200px"></DatePicker>
                    </Col>
                 </Row>
             </FormItem>
-            <FormItem label="车牌号：">
-                <Input v-model="formItem.carNumber" type="text" placeholder="公车车牌"></Input>
+            <FormItem label="车牌号：" prop="carNumber">
+                <Input v-model="formValidate.carNumber" type="text" placeholder="公车车牌"></Input>
             </FormItem>
-            <FormItem label="用车定位：">
-                <Input v-model="formItem.userlocation" icon="location" style="max-width: 80%"></Input>
-                <i-switch v-model="formItem.switch"　@on-change="getlocation">
+            <FormItem label="车辆定位：" prop="userlocation">
+                <Input v-model="formValidate.userlocation" icon="location" style="max-width: 80%"></Input>
+                <i-switch v-model="formValidate.switch"　@on-change="getlocation">
                     <span slot="open">开</span>
                     <span slot="close">关</span>
                 </i-switch>
@@ -30,17 +30,17 @@
                     <div id="driveMap"></div>
                 </div>
             </FormItem>
-            <FormItem label="出行任务：">
-                <Input v-model="formItem.task" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请输入公车出行任务..."></Input>
+            <FormItem label="任务：" prop="task">
+                <Input v-model="formValidate.task" type="textarea" :autosize="{minRows: 4,maxRows: 6}" placeholder="请登记公车出行任务..."></Input>
             </FormItem>
+            <Button type="primary" long style="font-size: 16px" @click="handleSubmit('formValidate')">提交</Button>
         </Form>
-        <Button type="primary" long style="font-size: 16px" @click="submitDrive">提交</Button>
     </div>
 </template>
 
 <style scoped>
 .drive-page{
-    width: 95%;
+    width: 97%;
     height: auto;
     min-height: 100%;
     margin-left: auto;
@@ -97,15 +97,46 @@
 <script>
  export default {
     data () {
+        var checkCarNumber = (rule, value, callback) => {
+            var _url = '/checkCarNumber?carNumber=' + value,
+                _this = this;
+
+            this.axios({
+                method: 'get',
+                url: _url
+            }).then(function (response){
+                if(!response.data.status){
+                    callback(new Error('车牌号不存在，请确认！'));
+                }else{
+                    callback();
+                }
+            }).catch(function (error){
+                throw error;
+            });
+        };
         return {
             videoflag: false,
-            formItem: {
+            formValidate: {
                 switch: false,
                 carImage: '',
                 useTime: '使用时间',
                 carNumber: '',                
                 userlocation: '出发位置',
                 task: ''
+            },
+            ruleValidate: {
+                carImage: [
+                    { required: true, message: '请拍摄照片并上传', trigger: 'blur' }
+                ],
+                carNumber: [
+                    { required: true, validator: checkCarNumber ,trigger: 'blur' }
+                ],
+                userLocation: [
+                    { required: true, message: '请定位当前用车位置',trigger: 'blur' }
+                ],
+                task: [
+                    { required: true, message: '请定位当前用车位置',trigger: 'blur' }                    
+                ]
             },
             options1: {
                     shortcuts: [
@@ -211,7 +242,7 @@
                             img.onload = function (){
                                 _canvas.getContext('2d').drawImage(img,0,0,350,150);
                                 _this.$Message.success('照片提交成功！');                                
-                                _this.formItem.carImage = _canvas.toDataURL();
+                                _this.formValidate.carImage = _canvas.toDataURL();
                             }
                     }catch(e){
                         try{
@@ -223,7 +254,7 @@
                                     img.src = e.target.result;
                                     _canvas.getContext('2d').drawImage(img,0,0,350,150);
                                     _this.$Message.success('照片提交成功！');                                    
-                                    _this.formItem.carImage = _canvas.toDataURL();
+                                    _this.formValidate.carImage = _canvas.toDataURL();
                                 }
                                 fileReader.readAsDataURL(file);
                         }catch(e){
@@ -244,14 +275,14 @@
                  location_icon = document.getElementById('location-icon');
 
             _mapContainer[0].style.border = '0';
-            if(_this.formItem.switch){
+            if(_this.formValidate.switch){
                 var map,
                     geolocation;
 
                 location_icon.style.display = 'none';
                 //解析定位结果
                 function onComplete(data) {
-                    _this.formItem.userlocation = data.position.getLng() + '；' + data.position.getLat();
+                    _this.formValidate.userlocation = data.position.getLng() + '；' + data.position.getLat();
                     _this.$Message.success('定位成功！');
                 }
                 //解析定位错误信息
@@ -279,51 +310,56 @@
                 _this.$Message.error('定位已关闭！');
             }
         },
-        submitDrive() {
-            let _this = this;
-            let _userlocation = this.formItem.userlocation.split('；');    
+        handleSubmit(name) {
+            let _this = this,
+                _userlocation = this.formValidate.userlocation.split('；');
 
-            if(window.localStorage.getItem('userNumber')){
-                this.axios({
-                method: 'post',
-                url: '/drive',
-                data: {
-                    carImage: this.formItem.carImage,
-                    userNumber: window.localStorage.getItem('userNumber'),
-                    useTime: [this.formItem.useTime[0],this.formItem.useTime[1]],
-                    userLocation: _userlocation,
-                    carNumber: this.formItem.carNumber,   
-                    task: this.formItem.task,
-                    useStatus: false   
-                }
-            }).then(function (response){
-                    switch(response.data.status){
-                        case 1 :  _this.$Message.success('登记成功！');                        
-                                    setTimeout(function() {
-                                        _this.$router.push('/carlist');
-                                    }, 1000);
-                                    break;
-                        case 0 :  _this.$Message.error('登记失败！请重新登记。');
-                                    setTimeout(function() {
-                                        _this.$router.push('/drive');
-                                    }, 1000);
-                                    break;
-                        case -1:  _this.$Message.error('车辆已被借用！请更换车辆或联系使用者。');
-                                    setTimeout(function() {
-                                        _this.$router.push('/carlist');    
-                                    }, 1000);
-                                    break;
-                        default  :  break;
-                    };
-                }).catch(function (error){
-                    if(error){
-                        throw error;
+            this.$refs[name].validate((valid) => {
+                if(valid){    
+                    console.log('111');
+                    if(window.localStorage.getItem('userNumber')){
+                        this.axios({
+                        method: 'post',
+                        url: '/drive',
+                        data: {
+                            carImage: this.formValidate.carImage,
+                            userNumber: window.localStorage.getItem('userNumber'),
+                            useTime: [this.formValidate.useTime[0],this.formValidate.useTime[1]],
+                            userLocation: _userlocation,
+                            carNumber: this.formValidate.carNumber,   
+                            task: this.formValidate.task,
+                            useStatus: false   
+                        }
+                    }).then(function (response){
+                            switch(response.data.status){
+                                case 1 :  _this.$Message.success('登记成功！');                        
+                                            setTimeout(function() {
+                                                _this.$router.push('/carlist');
+                                            }, 1000);
+                                            break;
+                                case 0 :  _this.$Message.error('登记失败！请重新登记。');
+                                            setTimeout(function() {
+                                                _this.$router.push('/drive');
+                                            }, 1000);
+                                            break;
+                                case -1:  _this.$Message.error('车辆已被借用！请更换车辆或联系使用者。');
+                                            setTimeout(function() {
+                                                _this.$router.push('/carlist');    
+                                            }, 1000);
+                                            break;
+                                default  :  break;
+                            };
+                        }).catch(function (error){
+                            if(error){
+                                throw error;
+                            }
+                        });
+                    }else{
+                        window.localStorage.removeItem('user_token');
+                        this.$router.push('/signin');
                     }
-                });
-            }else{
-                window.localStorage.removeItem('user_token');
-                this.$router.push('/signin');
-            }
+                }
+            });
         }
     }
 }   
