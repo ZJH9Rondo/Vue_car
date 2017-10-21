@@ -185,21 +185,32 @@
                                 'department': _this.formValidate.department
                             },
                             transformRequest: [function (data) {
-                                // Do whatever you want to transform the data
                                 let ret = ''
                                 for (let it in data) {
-                                ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&';
                                 }
-                                return ret
+                                return ret;
                             }],
                             headers : {
                                 "Content-Type":'application/x-www-form-urlencoded; charset=UTF-8'
                             },
                         }).then(function (response){
-                            _this.$Message.success('注册成功');
-                            setTimeout(function() {
-                                _this.$router.push('/'); 
-                            }, 1000);
+                            switch (response.data.status) {
+                                case 1:
+                                    _this.$Message.success('注册成功');
+                                    setTimeout(function() {
+                                        _this.$router.push('/'); 
+                                    }, 1000);       
+                                    break;
+                                case -1:
+                                    _this.$Message.warning('该用户已注册，请勿重复注册！');
+                                    break;
+                                case 0:
+                                    _this.$Message.error('注册失败，请重新提交注册。');
+                                    break;
+                                default:
+                                    break;
+                            }
                         }).catch(function (error){
                             console.log(error);
                         });

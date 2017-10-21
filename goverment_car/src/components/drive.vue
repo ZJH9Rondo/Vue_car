@@ -35,12 +35,27 @@
             </FormItem>
             <Button type="primary" long style="font-size: 16px" @click="handleSubmit('formValidate')">提交</Button>
         </Form>
+        <Modal v-model="driveTips"  :closable="false" :mask-closable="false">
+            <p slot="header" style="color:#f60;text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span>登记使用说明</span>
+            </p>
+            <div style="text-align:center">
+                <p class="tipsContent">1.公车使用登记时，请点击橙色按钮打开摄像头对此次使用的公务车正前方，镜头中必须出现尽可能清楚的车牌号，拍照并上传（上传：即手机拍照完后选择使用该照片即可）。</p>
+                <p class="tipsContent">2.时间填写选择为本次使用的起始与截止时间段，车牌号填写公务车车牌号只填写后五位，不包括所在地。</p>
+                <p class="tipsContent">3.车辆定位点击右侧滑块，即可打开，由于兼容性问题，请您务必打开手机端GPS定位，并且在用车期间保持GPS开启<span style="color: red">（非必要）</span>和移动网络畅通<span style="color: red">（必要）</span>，保证机关对该车辆的正常监管，此过程数据只关系定位功能，不涉及数据采集和隐私，请勿担心。</p>
+                <p class="tipsContent">4.任务描述填写本次公务车使用的任务及前往地点，以便后期监管核查，谢谢合作。</p>                
+            </div>
+            <div slot="footer">
+                <Button type="success" size="large" long :loading="modal_loading" @click="driveTips=false">我已阅读</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 
 <style scoped>
 .drive-page{
-    width: 97%;
+    width: 96%;
     height: auto;
     min-height: 100%;
     margin-left: auto;
@@ -48,6 +63,12 @@
     margin-top: 0 !important;
     margin-bottom: 80px;
     padding-top: 20px; 
+}
+.tipsContent{
+    text-align: left;
+    font-size: 14px;
+    text-indent: 20px;
+    letter-spacing: 1px;
 }
 .canvas-container{
     width: 90%;
@@ -116,6 +137,7 @@
         };
         return {
             videoflag: false,
+            driveTips: true,
             formValidate: {
                 switch: false,
                 carImage: '',
@@ -301,6 +323,7 @@
                         zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
                         buttonPosition:'RB'
                     });
+ 
                     map.addControl(geolocation);
                     geolocation.getCurrentPosition();
                     AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息

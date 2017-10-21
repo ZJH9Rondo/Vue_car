@@ -72,23 +72,27 @@
               let _this = this;
               let sha1 = crypto.createHash('sha1');
               
-              this.axios({
-                method: 'post',
-                url: '/login',
-                data: {
-                  user: this.formInline.user,
-                  password: sha1.update(_this.formInline.password).digest('hex')
+              if(this.formInline.user && this.formInline.password){
+                    this.axios({
+                    method: 'post',
+                    url: '/login',
+                    data: {
+                      user: this.formInline.user,
+                      password: sha1.update(_this.formInline.password).digest('hex')
+                    }
+                  }).then(function (response){
+                    _this.$Message.success('登录成功!');
+                    window.localStorage.setItem('user_token',response.data.token);
+                    window.localStorage.setItem('userNumber',_this.formInline.user);
+                    setTimeout(function (){
+                        _this.$router.push('/');
+                    },1000); 
+                  }).catch(function (error){
+                    _this.$Message.error('登录失败！');
+                  });
+                }else{
+                  _this.$Message.error('请填写用户名和密码！');
                 }
-              }).then(function (response){
-                 _this.$Message.success('登录成功!');
-                 window.localStorage.setItem('user_token',response.data.token);
-                 window.localStorage.setItem('userNumber',_this.formInline.user);
-                 setTimeout(function (){
-                    _this.$router.push('/');
-                 },1000); 
-              }).catch(function (error){
-                _this.$Message.error('登录失败！');
-              });
             }
         }
     }

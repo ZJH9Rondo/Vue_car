@@ -11,7 +11,7 @@
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
-    <mt-tabbar fixed style="z-index:999">
+    <mt-tabbar fixed style="z-index:999" id="tabbar">
       <!-- img=100*100.png -->
       <mt-tab-item id="公车状态">
         <img slot="icon" src="./assets/carlist.png" @click="golist()">
@@ -26,6 +26,7 @@
         个人中心
       </mt-tab-item>
     </mt-tabbar>
+    <Spin size="large" fix v-if="spinShow" style="z-index:9999">Loading...</Spin>
   </div>
 </template>
 
@@ -36,7 +37,35 @@ export default {
   name: 'app',
   components: {Header,Tabbar,TabItem},
   data(){
-    return {}
+    return {
+      spinShow: false
+    }
+  },
+  created() {
+    try{
+      var loadingGIF = document.getElementById('appLoading');
+
+      document.body.removeChild(loadingGIF);
+      setTimeout(function() {
+        document.getElementById('app').style.display = 'block';
+        
+        // fix 移动端键盘弹出顶起tabbar
+        (function () {
+           var _height = document.documentElement.clientHeight,
+               _tabbar = document.getElementById('tabbar');
+
+           window.addEventListener('resize',function (){
+             if(document.documentElement.clientHeight < _height){
+                _tabbar.style.display = 'none';
+             }else{
+                _tabbar.style.display = 'flex';
+             }
+           },false);
+        })();
+      }, 500);
+    }catch(e){
+      throw e;
+    }
   },
   methods: {
     golist() {

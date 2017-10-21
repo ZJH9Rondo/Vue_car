@@ -5,9 +5,10 @@
             <img :src="item.carImage" alt="公车图片" />
         </div>
         <div class="item-content">
-            <p>姓名：{{item.userName}}</p>
-            <p>手机：{{item.userPhone}}</p>
-            <p class="content">车辆状态：{{item.carStatus}}</p>
+            <p><span>姓名：</span>{{item.userName}}</p>
+            <p><span>手机：</span>{{item.userPhone}}</p>
+            <p><span>车牌号：</span>{{item.carNumber}}</p>
+            <p><span>车辆状态：</span><span >{{item.carStatus}}</span></p>
         </div>
         <div class="clear"></div>
     </div>
@@ -59,14 +60,8 @@
     text-align: left;
     margin-top: 3px;
 }
-.content{
-    min-height: 40px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-align: left;
-    margin-top: 3px;
+.item-content>p>span{
+    color: #8B8B81;
 }
 .clear{
     clear: both;
@@ -177,7 +172,6 @@ export default {
                     map,
                     marker;
 
-                console.log(_position);
                 map = new AMap.Map('Map', {
                     resizeEnable: true,
                     zoom:17,

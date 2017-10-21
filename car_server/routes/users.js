@@ -40,26 +40,38 @@ router.post('/register', function(req, res, next) {
     var hmac = crypto.createHmac('sha256',slat); // 密码加密存储
     req.body.password = hmac.update(req.body.password).digest('hex');
 
-    var UserAdd = new User({
-      name: req.body.name,
-      password: req.body.password,
-      phone: req.body.phone,
-      number: req.body.number,
-      department: req.body.department,
-      slat: slat
-    });
-
-    UserAdd.save(function(err) {
-      if(err){
-        throw err;
-        res.json({
-          'status': false
-        })
-      }else{
-        res.json({
-          'status': true
-        });      
-      }
+    User.find({number: req.body.number}).exec(function (err,result){
+        if(err){
+          throw err;
+        }
+        
+        if(result.length === 0){
+            var UserAdd = new User({
+              name: req.body.name,
+              password: req.body.password,
+              phone: req.body.phone,
+              number: req.body.number,
+              department: req.body.department,
+              slat: slat
+            });
+        
+            UserAdd.save(function(err) {
+              if(err){
+                throw err;
+                res.json({
+                  'status': 0
+                })
+              }else{
+                res.json({
+                  'status': 1
+                });      
+              }
+            });
+        }else{
+          res.json({
+            'status': -1
+          })
+        }
     });
 });
 

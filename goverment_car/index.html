@@ -2,7 +2,8 @@
 <html>
   <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type">     
-    <meta charset="utf-8">             
+    <meta charset="utf-8">     
+    <title>公车管理平台</title>        
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0,user-scalable=no,minimal-ui" name="viewport">     
     <meta content="yes" name="apple-mobile-web-app-capable">     
     <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style">     
@@ -19,13 +20,32 @@
     <meta name="HandheldFriendly" content="true">
     <!-- Add to homescreen for Iphone-->
     <meta name="MobileOptimized" content="320">
-    <link rel="apple-touch-icon-precomposed" href="./static/img/goverment_car.png">
+    <link rel="apple-touch-icon-precomposed" href="./static/img/App.png">
     <!-- Add to homescreen for Chrome on Android -->
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="196x196" href="./static/img/goverment_car.png">
-    <title>公车管理平台</title>
+    <link rel="icon" sizes="196x196" href="./static/img/App.png">
+    <style>
+      #appLoading{
+        width: 100%;
+        height: 100%;
+      }
+      #appLoading>img{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+      #app{
+        display: none;
+      }
+    </style>
   </head>
   <body>
+    <div id="appLoading">
+      <img src="./static/img/loading.gif" alt="loading">
+    </div>
     <div id="app"></div>
     <!-- built files will be auto injected -->
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.0&key=1d6aeae85a2950fc04287fb028605267"></script>
