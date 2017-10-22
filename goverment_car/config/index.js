@@ -56,6 +56,20 @@ module.exports = {
           '^/checktoken': '/checktoken'
         }
       },
+      '/sendCode': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/sendCode': '/sendCode'
+        }
+      },
+      '/checkAdmin': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/checkAdmin': '/checkAdmin'
+        }
+      },
       '/drive': {
         target: 'http://localhost:3000',
         changerOrigin: true,

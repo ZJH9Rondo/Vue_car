@@ -78,7 +78,30 @@ export default {
       this.$router.push('/user');
     },
     addcar() {
-      this.$router.push('/addcar');
+      var _this = this;
+
+      if(window.localStorage.getItem('userNumber')){
+          var _url = '/checkAdmin?user=' + window.localStorage.getItem('userNumber');
+      }else{
+          this.$Message.error('操作异常！请重新登录。');
+          setTimeout(function() {
+              this.$router.push('/signin');
+          }, 1000);
+      }
+
+      this.axios({
+          method: 'get',
+          url: _url 
+      }).then(function (response){
+          if(response.data.status){
+              _this.$Message.success('管理员身份确认成功！');
+          }else{
+              _this.$Message.error('对不起，您不是管理员，你无权执行此操作！');
+              setTimeout(function() {
+                  _this.$router.push('/');
+              }, 1000);
+          }
+      })
     },
     usermenu(){
       this.$router.push('/user');

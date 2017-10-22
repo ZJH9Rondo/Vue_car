@@ -82,7 +82,8 @@ export default {
               ]
           }
       }
-  },methods: {
+  },
+  methods: {
       useCamera() {
             var _cameraInput = document.createElement('input');
             var _this = this;

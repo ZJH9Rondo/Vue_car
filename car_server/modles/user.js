@@ -8,7 +8,8 @@ var UserModule = new Schema({
     number: String,
     department: String,
     slat: String,
-    useStatus: {type: Boolean,default: true}
+    useStatus: {type: Boolean,default: true},
+    admin: {type: Boolean,default: false}
 });
 
 var User = mongoose.model('users',UserModule);
