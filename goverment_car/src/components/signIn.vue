@@ -6,10 +6,10 @@
           <Icon type="ios-person-outline" slot="prepend"></Icon>
         </Input>
       </FormItem>
-      <FormItem prop="password">
+      <FormItem prop="password" class="inputItem">
          <Input type="password" v-model="formInline.password" placeholder="Password">
             <Icon type="ios-locked-outline" slot="prepend"></Icon>
-        </Input>
+         </Input>
       </FormItem>
       <FormItem>
         <Button class="sign-button" type="primary" @click="handleSubmit()">登录</Button>
@@ -17,7 +17,11 @@
     </Form>
     <p class="signup-box">
       <router-link to="/signup">
-        <a>还没有账号？去注册</a>
+        <a>注册账号</a>
+      </router-link>
+      <span style="border: 1px solid #cccccc;width: 0px;height: 1px;margin-right: 5px"></span>
+      <router-link to="/changePwd">
+        <a>修改密码</a>
       </router-link>
     </p>
   </div>
@@ -34,16 +38,15 @@
     top: 0;
     bottom: 0;
   }
-  .sign-input{
-    height: 50px;
-  }
-  .sign-button{
-    width: 100%;
-    height: 40px;
-  }
-  .signup-box{
-    height: 20px;
-  }
+.sign-button{
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+  letter-spacing: 5px;
+}
+.signup-box{
+  height: 20px;
+}
 </style>
 
 <script>
@@ -81,14 +84,18 @@
                       password: sha1.update(_this.formInline.password).digest('hex')
                     }
                   }).then(function (response){
-                    _this.$Message.success('登录成功!');
-                    window.localStorage.setItem('user_token',response.data.token);
-                    window.localStorage.setItem('userNumber',_this.formInline.user);
-                    setTimeout(function (){
-                        _this.$router.push('/');
-                    },1000); 
+                    if(response.data.status){
+                      _this.$Message.success('登录成功!');
+                      window.localStorage.setItem('user_token',response.data.token);
+                      window.localStorage.setItem('userNumber',_this.formInline.user);
+                      setTimeout(function (){
+                          _this.$router.push('/');
+                      },1000); 
+                    }else{
+                      _this.$Message.error('密码错误！请重新登录。');
+                    }
                   }).catch(function (error){
-                    _this.$Message.error('登录失败！');
+                    _this.$Message.error('登录失败！请刷新页面后重新登录。');
                   });
                 }else{
                   _this.$Message.error('请填写用户名和密码！');

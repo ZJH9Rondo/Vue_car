@@ -86,6 +86,7 @@ router.post('/login',function(req,res,next) {
       var hmac = crypto.createHmac('sha256',result[0].slat);
       req.body.password = hmac.update(req.body.password).digest('hex');
       
+      console.log(req.body.password);
       if(result[0].password === req.body.password){
         var _token = Token.crate(req.body.user);
 
@@ -100,6 +101,53 @@ router.post('/login',function(req,res,next) {
         });
       } 
     }); 
+});
+
+/*
+ *  method: POST
+ *  url: ' /changePwd '
+ *  params: number & oldPassword & newPassword
+ *  return: 1/-1/0 { datatype: Number}
+ */
+router.post('/changePwd',function(req,res,next) {
+    User.find({number: req.body.number}).exec(function (err,result) {
+       if(err){
+         res.statusCode = 500;
+         res.end();
+       }
+       
+       if(result.length === 0){
+          res.json({
+            'status': 0
+          })
+       }else{
+          var _oldhmac = crypto.createHmac('sha256',result[0].slat);
+          req.body.oldPassword = _oldhmac.update(req.body.oldPassword).digest('hex');
+
+          if(req.body.oldPassword === result[0].password){
+              var _newhmac = crypto.createHmac('sha256',result[0].slat);
+              req.body.newPassword = _newhmac.update(req.body.newPassword).digest('hex');
+
+              User.update({number: req.body.number},{password: req.body.newPassword},function (error,docs){
+                  if(error){
+                    throw error;
+                    res.statusCode = 500;
+                    res.end();
+                  }
+
+                  var _token = Token.crate(req.body.user);
+                  res.json({
+                    'token': _token,
+                    'status': 1
+                  });
+              });
+          }else{
+            res.json({
+              'status': -1
+            });
+          }
+       }
+    });
 });
 
 module.exports = router;

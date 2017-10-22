@@ -7,6 +7,7 @@ import Drive from '@/components/drive'
 import User from '@/components/user'
 import Carlist from '@/components/carList'
 import Addcar from '@/components/addCar'
+import Changepwd from '@/components/changePwd'
 
 Vue.use(Router)
 
@@ -35,6 +36,10 @@ var router = new Router({
       path: '/signin',
       name: 'signIn',
       component: Signin,
+    },{
+      path: '/changePwd',
+      name: 'changePwd',
+      component: Changepwd,
     },{
       path: '/signup',
       name: 'signUp',

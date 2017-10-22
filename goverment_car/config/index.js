@@ -35,6 +35,13 @@ module.exports = {
           '^/register': '/register'
         }
       },
+      '/changePwd': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/changePwd': '/changePwd'
+        }
+      },
       '/login': {
         target: 'http://localhost:3000',
         changerOrigin: true,

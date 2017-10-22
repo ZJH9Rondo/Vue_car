@@ -72,7 +72,6 @@ router.post('/drive',function (req,res,next){
                     var _userTarget = result[0];
 
                     carModule.find({carNumber: req.body.carNumber}).exec(function (err,result){
-                        console.log(result);
                         if(result[0].carStatus){
                             carModule.update({carNumber: req.body.carNumber},{userName: _userTarget.name,userPhone: _userTarget.phone,position: req.body.userLocation,carStatus: req.body.useStatus},function (error){
                                 if(error){

@@ -199,7 +199,7 @@
                                 case 1:
                                     _this.$Message.success('注册成功');
                                     setTimeout(function() {
-                                        _this.$router.push('/'); 
+                                        _this.$router.push('/signin'); 
                                     }, 1000);       
                                     break;
                                 case -1:
@@ -212,7 +212,7 @@
                                     break;
                             }
                         }).catch(function (error){
-                            console.log(error);
+                           throw error;
                         });
                     }else{
                         _this.$Message.success('请确认表单信息格式正确后提交！');
