@@ -338,8 +338,7 @@
                 _userlocation = this.formValidate.userlocation.split('；');
 
             this.$refs[name].validate((valid) => {
-                if(valid){    
-                    console.log('111');
+                if(valid){
                     if(window.localStorage.getItem('userNumber')){
                         this.axios({
                         method: 'post',

@@ -8,6 +8,7 @@ var AdminModule = new Schema({
     number: String,
     department: String,
     code: String,
+    time: String,
     admin: {type: Boolean,default: true}
 });
 

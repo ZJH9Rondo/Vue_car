@@ -49,6 +49,13 @@ module.exports = {
           '^/login': '/login'
         }
       },
+      '/rootlogin': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/rootlogin': '/rootlogin'
+        }
+      },
       '/checktoken': {
         target: 'http://localhost:3000',
         changerOrigin: true,

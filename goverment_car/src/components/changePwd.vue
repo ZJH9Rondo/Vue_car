@@ -119,11 +119,14 @@ export default {
                     _this.$router.push("/signin");
                   }, 1000);
                   break;
+                case 0:
+                  _this.$Message.error("账号不存在，请修正后提交！");
+                  break;
                 case -1:
                   _this.$Message.warning("原密码错误！请更改后重新提交。");
                   break;
-                case 0:
-                  _this.$Message.error("账号不存在，请修正后提交！");
+                case -2:
+                  _this.$Message.success("管理员关联普通账号以后请用新密码登录");
                   break;
                 default:
                   break;

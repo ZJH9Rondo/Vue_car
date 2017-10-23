@@ -17,7 +17,6 @@ router.get('/checkCarNumber',function (req,res,next){
 
     if(_carNumber){
         carModule.find({carNumber: _carNumber}).exec(function (err,result) {
-            console.log(result);
            if(err){
                res.statusCode = 500;
                res.json({

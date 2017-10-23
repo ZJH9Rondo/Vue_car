@@ -95,6 +95,9 @@ export default {
       }).then(function (response){
           if(response.data.status){
               _this.$Message.success('管理员身份确认成功！');
+              setTimeout(function() {
+                  _this.$router.push('/addcar');
+              }, 500);
           }else{
               _this.$Message.error('对不起，您不是管理员，你无权执行此操作！');
               setTimeout(function() {
