@@ -19,7 +19,8 @@
         </p>
         <div id="Map"></div>
         <div slot="footer">
-            <Button type="warning" long @click="closeMap" style="font-size: 16px">关闭</Button>
+            <Button type="warning" @click="closeMap" style="font-size: 16px">关闭</Button>
+            <Button type="success" size="small" :disabled="telStatus"><a :href="tel"></a>联系他</Button>  
         </div>
     </Modal>
     <BackTop :bottom="70">
@@ -107,7 +108,9 @@ export default {
     data() {
       return {
             Mapflag: false,
-            carShowlist: []
+            carShowlist: [],
+            telStatus: true,
+            tel: ''
         }
     },
     created() {
@@ -165,6 +168,10 @@ export default {
         },
         getlocation(item) {
             this.Mapflag = true;
+            if(item.carStatus === '忙碌'){
+                this.telStatus = false;
+                this.tel = item.phone;
+            }
 
             if(this.Mapflag){
                 var _this = this,

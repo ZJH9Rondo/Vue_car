@@ -2,7 +2,7 @@ var mongoose = require('../config/config');
 var Schema = mongoose.Schema;
 
 var driveModule = new Schema({
-    carImage: String,
+    carImage: Object,
     userNumber: String,
     useTime: [Schema.Types.String],
     userLocation: String,

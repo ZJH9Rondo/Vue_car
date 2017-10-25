@@ -2,12 +2,15 @@
     <div class="drive-page">
         <h2>用车登记</h2>
         <Form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="80" style="margin-top: 10px">
-            <FormItem label="拍照：" style="margin-top: 10px" prop="carImage">
+            <FormItem label="拍照：" style="margin-top: 10px">
                 <div class="canvas-container">
                     <img id="photo-icon" src="../assets/camera.png">
-                    <canvas id="drive_canvas"></canvas>
+                    <img id="compress_IMG">
                 </div>
-                <Button type="warning" @click="takePhoto" style="width: 90%;font-size: 14px;margin-top: 10px;margin-left: -26px">启动摄像头</Button>
+                <div style="width: 90%;margin-top: 10px;position: relative">
+                    <Button type="warning" style="width: 100%">启动摄像头</Button>
+                    <input type="file" accept="image/*" id="photo" @click="takePhoto">
+                </div>
             </FormItem>
             <FormItem label="时间段：">
                 <Row>
@@ -78,6 +81,13 @@
     background-color: rgba(39, 40,34, 0.4);
     border-radius: 8px;
 }
+#photo{
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
 #photo-icon{
     position: absolute;
     top: 0;
@@ -86,7 +96,7 @@
     right: 0; 
     margin: auto;
 }
-#drive_canvas{
+#compress_IMG{
     width: 100%;
     height: 100%;
     margin-left: 0;
@@ -116,6 +126,9 @@
 </style>
 
 <script>
+// import compress from '../../static/js/compress'
+import lrz from 'lrz'
+
  export default {
     data () {
         var checkCarNumber = (rule, value, callback) => {
@@ -147,9 +160,9 @@
                 task: ''
             },
             ruleValidate: {
-                carImage: [
-                    { required: true, message: '请拍摄照片并上传', trigger: 'blur' }
-                ],
+                // carImage: [
+                //     { required: true, message: '请拍摄照片并上传', trigger: 'blur' }
+                // ],
                 carNumber: [
                     { required: true, validator: checkCarNumber ,trigger: 'blur' }
                 ],
@@ -230,66 +243,36 @@
     },
     methods:{
         takePhoto() {
-            var _cameraInput = document.createElement('input');
-            var _this = this;
-
-            _cameraInput.id = 'drive_camera';
-            _cameraInput.type = 'file';
-            _cameraInput.accept = 'image/*';
-            _cameraInput.capture = 'camera';
+            var    _this = this;
             
-            _cameraInput.addEventListener('change',function (event){
-                var _canvas = document.getElementById('drive_canvas'),
+            document.getElementById('photo').addEventListener('change',function () {
+                var _compressIMG = document.getElementById('compress_IMG'),
                     _photoIcon = document.getElementById('photo-icon'),
-                    _canvasContainer = document.getElementsByClassName('canvas-container'),
-                    e = event || window.event;
-                
-                var files = e.target.files;
+                    _canvasContainer = document.getElementsByClassName('canvas-container');
+
+                var that = this;
+
                 _photoIcon.style.display = 'none';
                 _canvasContainer[0].style.backgroundColor = 'white';
-
-                if(files && files.length>0){
-                    var file = files[0],
-                        img = new Image();
-                    
-                    /*
-                    * 防止浏览器不支持　fileReader方法 
-                    */
-                    try{
-                        // get window.URL object                            
-                            var URL = window.URL || window.webkitURL,
-                                imgURL = URL.createObjectURL(file);
-                            
-                            img.src = imgURL;
-                            img.onload = function (){
-                                _canvas.getContext('2d').drawImage(img,0,0,350,150);
-                                _this.$Message.success('照片提交成功！');                                
-                                _this.formValidate.carImage = _canvas.toDataURL();
-                            }
-                    }catch(e){
-                        try{
-                            var fileReader = new fileReader();
-
-                                fileReader.onload = function (event){
-                                    var e = event || window.event;
-
-                                    img.src = e.target.result;
-                                    _canvas.getContext('2d').drawImage(img,0,0,350,150);
-                                    _this.$Message.success('照片提交成功！');                                    
-                                    _this.formValidate.carImage = _canvas.toDataURL();
-                                }
-                                fileReader.readAsDataURL(file);
-                        }catch(e){
-                            _this.$Message.error('浏览器不支持，请更换浏览器访问操作！');
-                        }
-                    }
+                
+                if(that.files[0]){
+                    _this.$Message.success('正在处理图片...');  
+                    lrz(that.files[0],{width: 500}).then(function (rst){
+                        _compressIMG.src = rst.base64;
+                        _this.formValidate.carImage = rst.base64;
+                        setTimeout(function() {
+                            _this.$Message.success('照片提交成功！');  
+                        }, 500);  
+                    }).catch(function (e){
+                        _this.$Message.error('上传失败！');
+                    });
+                       
+                }else{
+                    _this.$Message.error('获取图片失败！请重试。');
                 }
             },false);
 
-            this.$Message.warning('正在打开摄像头...');                                    
-            setTimeout(function() {
-                _cameraInput.click();
-            }, 1000);
+            this.$Message.warning('正在打开摄像头...');                                  
         },
         getlocation() {
             var _this = this;
@@ -341,17 +324,17 @@
                 if(valid){
                     if(window.localStorage.getItem('userNumber')){
                         this.axios({
-                        method: 'post',
-                        url: '/drive',
-                        data: {
-                            carImage: this.formValidate.carImage,
-                            userNumber: window.localStorage.getItem('userNumber'),
-                            useTime: [this.formValidate.useTime[0],this.formValidate.useTime[1]],
-                            userLocation: _userlocation,
-                            carNumber: this.formValidate.carNumber,   
-                            task: this.formValidate.task,
-                            useStatus: false   
-                        }
+                            method: 'post',
+                            url: '/drive',
+                            data: {
+                                carImage: _this.formValidate.carImage,
+                                userNumber: window.localStorage.getItem('userNumber'),
+                                useTime: [_this.formValidate.useTime[0],_this.formValidate.useTime[1]],
+                                userLocation: _userlocation,
+                                carNumber: _this.formValidate.carNumber,   
+                                task: _this.formValidate.task,
+                                useStatus: false   
+                            }
                     }).then(function (response){
                             switch(response.data.status){
                                 case 1 :  _this.$Message.success('登记成功！');                        
