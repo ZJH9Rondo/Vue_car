@@ -4,7 +4,7 @@
         <FormItem label="车辆拍照">
             <div class="canvas-container">
                 <img id="photo-icon" src="../assets/camera.png">
-                <canvas id="caradd_canvas"></canvas>
+                <img id="compress_IMG">
             </div>
             <div style="width: 90%;margin-top: 10px;position: relative">
                 <Button type="warning" style="width: 100%">启动摄像头</Button>
@@ -56,7 +56,7 @@
     right: 0; 
     margin: auto;
 }
-#caradd_canvas{
+#compress_IMG{
     width: 100%;
     height: 100%;
     margin-left: 0;
@@ -64,6 +64,8 @@
 </style>
 
 <script>
+import lrz from 'lrz'
+
 export default {
   data() {
       let _this = this;
@@ -83,7 +85,7 @@ export default {
       return {
           videoflag: false,
           formItem: {
-              carImage: {},
+              carImage: '',
               carNumber: ''
           },
           ruleValidate: {
@@ -97,17 +99,20 @@ export default {
       useCamera() {
             var _this = this;
             
-            document.getElementById('photo').addEventListener('change',function (event){
-                var that = this;
+            document.getElementById('photo').addEventListener('change',function (){
+                var _compressIMG = document.getElementById('compress_IMG'),
+                    _photoIcon = document.getElementById('photo-icon'),
+                    _canvasContainer = document.getElementsByClassName('canvas-container'),
+                    that = this;
 
                 _photoIcon.style.display = 'none';
                 _canvasContainer[0].style.backgroundColor = 'white';
                 
                 if(that.files[0]){
-                    _this.$Message.success('正在处理图片...');  
+                    _this.$Message.success('正在处理图片...');                        
                     lrz(that.files[0],{width: 500}).then(function (rst){
                         _compressIMG.src = rst.base64;
-                        _this.formValidate.carImage = rst.base64;
+                        _this.formItem.carImage = rst.base64;
                         setTimeout(function() {
                             _this.$Message.success('照片提交成功！');  
                         }, 500);  

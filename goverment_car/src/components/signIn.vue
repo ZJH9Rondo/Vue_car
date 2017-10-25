@@ -108,7 +108,6 @@ export default {
           sha1 = crypto.createHash("sha1");
 
       this.$refs[name].validate((valid) => {
-        console.log(valid);
         if(valid){
           _this.axios({
             method: "post",
@@ -152,9 +151,7 @@ export default {
                   _this.$Message.success('管理员登录成功！');
                   window.localStorage.setItem('userNumber',_this.rootFormValidate.user);
                   window.localStorage.setItem('user_token',response.data.token);
-                  setTimeout(function() {
-                    _this.$router.push('/addcar');
-                  }, 1000);  
+                  _this.$router.push('/addcar');
                   break;
                 case 0:
                   _this.$Message.error('登录失败！请重新登录。');

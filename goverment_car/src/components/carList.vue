@@ -12,6 +12,13 @@
         </div>
         <div class="clear"></div>
     </div>
+    <BackTop :bottom="70">
+        <div class="top">返回顶端</div>
+    </BackTop>
+    <div class="list-refresh" @click="refresh">
+        <Icon id="loading" type="load-c" size=35 class="spin-icon-load"></Icon>
+        <Icon id="refresh" type="ios-refresh" :size="35" style="float: left"></Icon>
+    </div>
     <Modal v-model="Mapflag">
         <p slot="header" style="color:#f60;text-align:center">
             <Icon type="ios-navigate"></Icon>
@@ -20,16 +27,11 @@
         <div id="Map"></div>
         <div slot="footer">
             <Button type="warning" @click="closeMap" style="font-size: 16px">关闭</Button>
-            <Button type="success" size="small" :disabled="telStatus"><a :href="tel"></a>联系他</Button>  
+            <Button type="success" style="font-size: 16px" :disabled="telStatus">
+                <a id="telephoneURL" style="width:100%;height: 100%" :href="tel">联系他</a>
+            </Button>  
         </div>
     </Modal>
-    <BackTop :bottom="70">
-        <div class="top">返回顶端</div>
-    </BackTop>
-    <div class="list-refresh" @click="refresh">
-        <Icon id="loading" type="load-c" size=35 class="spin-icon-load"></Icon>
-        <Icon id="refresh" type="ios-refresh" :size="35" style="float: left"></Icon>
-    </div>
   </div>
 </template>
 
@@ -95,6 +97,10 @@
     height: 250px;
     min-height: 200px;
 }
+#telephoneURL{
+    text-decoration: none;
+    color: white;
+}
 /* 加载动画 */
 @keyframes ani-demo-spin {
     from { transform: rotate(0deg);}
@@ -122,7 +128,6 @@ export default {
             _this.carShowlist = response.data.carlist;
 
             for(var i = 0; i<_this.carShowlist.length;i++){
-                _this.carShowlist[i].carImage = 'data:image/png;base64,' + _this.carShowlist[i].carImage;
                 if(_this.carShowlist[i].carStatus){
                     _this.carShowlist[i].carStatus = '可用';
                 }else{
@@ -137,7 +142,7 @@ export default {
     },
     methods: {
         refresh() {
-            let _this = this;
+            var _this = this;
             var refreshIcon = document.getElementById('refresh');
             var loadingIcon = document.getElementById('loading');
 
@@ -152,8 +157,6 @@ export default {
                 _this.carShowlist = response.data.carlist;
                             
                 for(var i = 0; i<_this.carShowlist.length;i++){
-                    _this.carShowlist[i].carImage = 'data:image/png;base64,' + _this.carShowlist[i].carImage;
-
                     if(_this.carShowlist[i].carStatus){
                         _this.carShowlist[i].carStatus = '可用';
                     }else{
@@ -167,10 +170,18 @@ export default {
             });
         },
         getlocation(item) {
+            var _telephoneURL = document.getElementById('telephoneURL');
+            
             this.Mapflag = true;
+            
             if(item.carStatus === '忙碌'){
                 this.telStatus = false;
-                this.tel = item.phone;
+                this.tel = 'tel:' + item.userPhone;
+                _telephoneURL.style.color = 'white';
+            }else{
+                this.telStatus = true;
+                this.tel = 'tel:' + undefined;
+                _telephoneURL.style.color = 'black';
             }
 
             if(this.Mapflag){

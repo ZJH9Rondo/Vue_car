@@ -109,6 +109,7 @@
 .choose-item-icon {
   float: right;
   margin-right: 10px;
+  color: #cccccc;
 }
 .choose-item > div {
   clear: both;
@@ -146,6 +147,8 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+  letter-spacing: 1px;
+  font-size: 13px;
 }
 .use-finish {
   width: 90%;

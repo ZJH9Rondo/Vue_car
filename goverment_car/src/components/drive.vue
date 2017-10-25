@@ -12,10 +12,10 @@
                     <input type="file" accept="image/*" id="photo" @click="takePhoto">
                 </div>
             </FormItem>
-            <FormItem label="时间段：">
+            <FormItem label="还车时间：">
                 <Row>
                    <Col span="12">
-                     <DatePicker v-model="formValidate.useTime" type="daterange" :options="options2" placement="top-end" placeholder="用车时间" style="width: 200px"></DatePicker>
+                        <DatePicker v-model="formValidate.useTime" type="date" placeholder="选择日期" style="width: 200px"></DatePicker>
                    </Col>
                 </Row>
             </FormItem>
@@ -173,84 +173,17 @@ import lrz from 'lrz'
                     { required: true, message: '请定位当前用车位置',trigger: 'blur' }                    
                 ]
             },
-            options1: {
-                    shortcuts: [
-                        {
-                            text: '今天',
-                            value () {
-                                return new Date();
-                            },
-                            onClick: (picker) => {
-                                this.$Message.info('点击了今天');
-                            }
-                        },
-                        {
-                            text: '昨天',
-                            value () {
-                                const date = new Date();
-                                date.setTime(date.getTime() - 3600 * 1000 * 24);
-                                return date;
-                            },
-                            onClick: (picker) => {
-                                this.$Message.info('点击了昨天');
-                            }
-                        },
-                        {
-                            text: '一周前',
-                            value () {
-                                const date = new Date();
-                                date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-                                return date;
-                            },
-                            onClick: (picker) => {
-                                this.$Message.info('点击了一周前');
-                            }
-                        }
-                    ]
-                },
-                options2: {
-                    shortcuts: [
-                        {
-                            text: '最近一周',
-                            value () {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                                return [start, end];
-                            }
-                        },
-                        {
-                            text: '最近一个月',
-                            value () {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                                return [start, end];
-                            }
-                        },
-                        {
-                            text: '最近三个月',
-                            value () {
-                                const end = new Date();
-                                const start = new Date();
-                                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                                return [start, end];
-                            }
-                        }
-                    ]
-                }
         }
     },
     methods:{
         takePhoto() {
-            var    _this = this;
+            var  _this = this;
             
             document.getElementById('photo').addEventListener('change',function () {
                 var _compressIMG = document.getElementById('compress_IMG'),
                     _photoIcon = document.getElementById('photo-icon'),
-                    _canvasContainer = document.getElementsByClassName('canvas-container');
-
-                var that = this;
+                    _canvasContainer = document.getElementsByClassName('canvas-container'),
+                    that = this;
 
                 _photoIcon.style.display = 'none';
                 _canvasContainer[0].style.backgroundColor = 'white';
@@ -329,7 +262,7 @@ import lrz from 'lrz'
                             data: {
                                 carImage: _this.formValidate.carImage,
                                 userNumber: window.localStorage.getItem('userNumber'),
-                                useTime: [_this.formValidate.useTime[0],_this.formValidate.useTime[1]],
+                                useTime: _this.formValidate.useTime,
                                 userLocation: _userlocation,
                                 carNumber: _this.formValidate.carNumber,   
                                 task: _this.formValidate.task,
