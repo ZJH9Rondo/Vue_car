@@ -112,6 +112,20 @@ module.exports = {
           '^/addcar': '/addcar'
         }
       },
+      '/updatecar': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/updatecar': '/updatecar'
+        }
+      },
+      '/removecar': {
+        target: 'http://localhost:3000',
+        changerOrigin: true,
+        pathRewrite: {
+          '^/removecar': '/removecar'
+        }
+      },
       '/carlist': {
         target: 'http://localhost:3000',
         changerOrigin: true,

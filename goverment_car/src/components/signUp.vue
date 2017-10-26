@@ -4,20 +4,20 @@
             <FormItem label="姓名" prop="name">
                 <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
             </FormItem>
+            <FormItem label="政务编号" prop="number">
+                <Input v-model="formValidate.number" placeholder="请输入政务编号"></Input>
+            </FormItem>
             <FormItem label="密码" prop="password">
                 <Input v-model="formValidate.password" type="password" placeholder="请输入密码"></Input>
             </FormItem>
             <FormItem label="确认密码" prop="passwordCheck">
                 <Input v-model="formValidate.passwordCheck" type="password" placeholder="请确认密码"></Input>
             </FormItem>
-            <FormItem label="政务编号" prop="number">
-                <Input v-model="formValidate.number" placeholder="请输入政务编号"></Input>
-            </FormItem>
             <FormItem label="电话" prop="phone">
-                <Input v-model="formValidate.phone" placeholder="请输入政务编号"></Input>
+                <Input v-model="formValidate.phone" placeholder="请输入手机号"></Input>
             </FormItem>
             <FormItem label="部门" prop="department">
-                <Input v-model="formValidate.department" placeholder="请输入政务编号"></Input>
+                <Input v-model="formValidate.department" placeholder="请输入部门"></Input>
             </FormItem>
             <FormItem class="signup-button">
                 <Button type="primary" @click="handleSubmit('formValidate')">提交</Button>

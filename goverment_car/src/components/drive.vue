@@ -8,7 +8,7 @@
                     <img id="compress_IMG">
                 </div>
                 <div style="width: 90%;margin-top: 10px;position: relative">
-                    <Button type="warning" style="width: 100%">启动摄像头</Button>
+                    <Button type="warning" style="width: 100%;font-size: 14px">启动摄像头</Button>
                     <input type="file" accept="image/*" id="photo" @click="takePhoto">
                 </div>
             </FormItem>

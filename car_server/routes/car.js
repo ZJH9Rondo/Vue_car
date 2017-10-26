@@ -47,6 +47,80 @@ router.post('/addcar',function (req,res,next){
 
 /*
  *  method: GET
+ *  url: ' /removecar '
+ *  params: carNumber
+ *  return: Boolean { datatype: JSON && Boolean}
+ */
+router.get('/removecar',function (req,res,next){
+    carModule.find({carNumber: req.query.removeCarNumber}).exec(function (err,result){
+        if(err){
+            throw err;
+            res.statusCode = 500;
+            res.json({
+                'status': -1
+            });
+        }
+
+        if(result && result.length >= 1){
+            carModule.remove({carNumber: req.query.removeCarNumber},function (err,docs){
+                if(err){
+                    throw err;
+                    res.statusCode = 500;
+                    res.json({
+                        'status': -1
+                    });
+                }
+
+                res.json({
+                    'status': 1
+                });
+            });
+        }else{
+            res.json({
+                'status': 0 
+            });
+        }
+    });
+});
+
+/*
+ *  method: POST
+ *  url: ' /updatecar '
+ *  params: carImage & carNumber & newCarNumber
+ *  return: Boolean { datatype: JSON && Boolean}
+ */
+router.post('/updatecar',function (req,res,next){
+    carModule.find({carNumber: req.body.carNumber}).exec(function (err,result){
+        if(err){
+            throw err;
+            res.statusCode = 500;
+            res.end();
+        }
+
+        if(result && result.length >= 1){
+            carModule.update({carNumber: req.body.carNumber},{carImage:  req.body.carImage,carNumber: req.body.newCarNumber},function (err,docs) {
+                if(err){
+                    throw err;
+                    res.statusCode = 500;
+                    res.json({
+                        'status': 0
+                    });
+                }
+        
+                res.json({
+                    'status': 1
+                });
+            })
+        }else{
+            res.json({
+                'status': -1
+            });
+        }
+    });
+});
+
+/*
+ *  method: GET
  *  url: ' /carlist '
  *  params: null
  *  return: finishlist { datatype: JSON && Array}
